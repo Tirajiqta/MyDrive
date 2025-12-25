@@ -46,6 +46,6 @@ public class PlanEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PlanTranslationEntity> translations;
+//    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<PlanTranslationEntity> translations;
 }
