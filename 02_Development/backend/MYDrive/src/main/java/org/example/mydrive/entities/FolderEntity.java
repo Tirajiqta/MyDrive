@@ -44,9 +44,6 @@ public class FolderEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
-//    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<FolderTranslationEntity> translations;
-
     // Optional: For easy navigation within the entity graph
      @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
      private Set<FolderEntity> childrenFolderEntities;

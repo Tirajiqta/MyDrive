@@ -11,7 +11,5 @@ public record FolderResponse(
         UserResponse owner, // Could be just owner ID
         LocalDateTime creationDate,
         LocalDateTime lastModifiedDate,
-        Boolean isDeleted,
-        // If showing all translations for admin or debug
-        List<FolderTranslationResponse> allTranslations
+        Boolean isDeleted
 ) {}

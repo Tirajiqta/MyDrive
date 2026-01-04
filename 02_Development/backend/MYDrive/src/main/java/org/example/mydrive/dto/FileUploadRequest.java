@@ -11,9 +11,5 @@ public record FileUploadRequest(
         @NotNull(message = "File cannot be null")
         MultipartFile file,
 
-        Long parentId, // Null for root
-
-        @NotNull(message = "Translations cannot be null")
-        @Size(min = 1, message = "At least one translation is required")
-        List<FileTranslationRequest> translations
+        Long parentId // Null for root
 ) {}

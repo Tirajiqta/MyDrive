@@ -19,12 +19,20 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class PlanEntity {
+
+    public enum PlanType {FREE, PAID}
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
     private String internalName; // e.g., "FREE_PLAN", "BASIC_PLAN"
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private PlanType type = PlanType.FREE;
 
     @Column(nullable = false)
     private Integer storageLimitGB;
@@ -46,6 +54,4 @@ public class PlanEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-//    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<PlanTranslationEntity> translations;
 }

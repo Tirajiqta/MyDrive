@@ -43,6 +43,6 @@ public class UserEntity {
     @JoinColumn(name = "preferredLanguageId") // FK to LANGUAGES.id
     private LanguageEntity preferredLanguageEntity;
 
-     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
      private UserSubscriptionEntity activeSubscription;
 }

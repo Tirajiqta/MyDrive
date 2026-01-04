@@ -53,6 +53,4 @@ public class FileEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
-//    @OneToMany(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<FileTranslationEntity> translations;
 }

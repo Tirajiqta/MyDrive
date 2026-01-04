@@ -13,7 +13,5 @@ public record FileResponse(
         UserResponse owner, // Could be just owner ID
         LocalDateTime uploadDate,
         LocalDateTime lastModifiedDate,
-        Boolean isDeleted,
-        // If showing all translations for admin or debug
-        List<FileTranslationResponse> allTranslations
+        Boolean isDeleted
 ) {}

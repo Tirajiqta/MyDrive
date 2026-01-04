@@ -9,6 +9,6 @@ public record UserResponse(
         LocalDateTime createdAt,
         LocalDateTime lastLogin,
         Long currentStorageUsedBytes,
-        Long storageLimitGB, // From user's plan
+        Integer storageLimitGB, // From user's plan
         String preferredLanguageCode
 ) {}

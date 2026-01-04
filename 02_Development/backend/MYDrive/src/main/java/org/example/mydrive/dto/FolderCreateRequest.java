@@ -11,9 +11,6 @@ public record FolderCreateRequest(
         Long parentId, // Null for root folder
 
         @NotBlank(message = "Canonical name cannot be empty")
-        String canonicalName, // Base name for internal use
+        String canonicalName // Base name for internal use
 
-        @NotNull(message = "Translations cannot be null")
-        @Size(min = 1, message = "At least one translation is required")
-        List<FolderTranslationRequest> translations
 ) {}
