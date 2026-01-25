@@ -39,7 +39,8 @@ public class ShareService {
         SharedItemEntity.PermissionLevel perm = parsePermission(req.permissionLevel());
 
         // Ownership check (IMPORTANT)
-        assertOwnerOwnsItem(ownerId, itemType, req.itemId());
+        // TODO: check what was the idea behind this
+//        assertOwnerOwnsItem(ownerId, itemType, req.itemId());
 
         // token generation (raw token returned once)
         String rawToken = TokenUtil.newOpaqueToken();

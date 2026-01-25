@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.mydrive.dto.FolderCreateRequest;
 import org.example.mydrive.dto.FolderResponse;
 import org.example.mydrive.dto.FolderUpdateRequest;
+import org.example.mydrive.dto.UserResponse;
 import org.example.mydrive.entities.FolderEntity;
 import org.example.mydrive.entities.UserEntity;
+import org.example.mydrive.mappers.UserMapper;
 import org.example.mydrive.repositories.FolderRepository;
 import org.example.mydrive.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -117,13 +119,17 @@ public class FolderService {
     }
 
     private FolderResponse toResponse(FolderEntity f) {
+        UserResponse response = new UserMapper().toDto(f.getOwner());
         return new FolderResponse(
                 f.getId(),
-                f.getParent() == null ? null : f.getParent().getId(),
                 f.getCanonicalName(),
+                f.getCanonicalName(),
+                f.getParent() == null ? null : f.getParent().getId(),
+                response,
                 f.getCreationDate(),
                 f.getLastModifiedDate(),
                 f.getIsDeleted()
+
         );
     }
 }
