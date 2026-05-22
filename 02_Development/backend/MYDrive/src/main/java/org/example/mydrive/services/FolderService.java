@@ -37,8 +37,8 @@ public class FolderService {
         String name = req.canonicalName().trim();
 
         boolean exists = (parent == null)
-                ? folderRepository.existsByOwnerIdAndParentIsNullAndNameIgnoreCaseAndIsDeletedFalse(userId, name)
-                : folderRepository.existsByOwnerIdAndParentIdAndNameIgnoreCaseAndIsDeletedFalse(userId, parent.getId(), name);
+                ? folderRepository.existsByOwnerIdAndParentIsNullAndCanonicalNameIgnoreCaseAndIsDeletedFalse(userId, name)
+                : folderRepository.existsByOwnerIdAndParentIdAndCanonicalNameIgnoreCaseAndIsDeletedFalse(userId, parent.getId(), name);
 
         if (exists) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Folder name already exists");
@@ -72,8 +72,8 @@ public class FolderService {
 
             Long parentId = folder.getParent() == null ? null : folder.getParent().getId();
             boolean exists = (parentId == null)
-                    ? folderRepository.existsByOwnerIdAndParentIsNullAndNameIgnoreCaseAndIsDeletedFalse(userId, newName)
-                    : folderRepository.existsByOwnerIdAndParentIdAndNameIgnoreCaseAndIsDeletedFalse(userId, parentId, newName);
+                    ? folderRepository.existsByOwnerIdAndParentIsNullAndCanonicalNameIgnoreCaseAndIsDeletedFalse(userId, newName)
+                    : folderRepository.existsByOwnerIdAndParentIdAndCanonicalNameIgnoreCaseAndIsDeletedFalse(userId, parentId, newName);
 
             if (exists && !newName.equalsIgnoreCase(folder.getCanonicalName())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Folder name already exists");

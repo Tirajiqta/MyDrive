@@ -54,7 +54,7 @@ public class AuthService {
                 : userRepository.findByUsername(identifier)
         ).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
 
-        user.setLastLogin(LocalDateTime.from(Instant.now()));
+        user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
         String accessToken = jwtService.generateToken(user.getId(), user.getEmail());
@@ -115,7 +115,7 @@ public class AuthService {
         });
     }
 
-    public UserResponse register(UserRegisterRequest request) {
+    public AuthTokensResponse register(UserRegisterRequest request) {
         String email = request.email().trim().toLowerCase();
         String username = request.username().trim().toLowerCase();
 
@@ -165,7 +165,9 @@ public class AuthService {
         savedUser.setActiveSubscription(savedSub);
         savedUser = userRepository.save(savedUser);
 
-        return toUserResponse(savedUser);
+        String accessToken = jwtService.generateToken(savedUser.getId(), savedUser.getEmail());
+        String refresh = refreshToken(savedUser);
+        return new AuthTokensResponse(accessToken, refresh, toUserResponse(savedUser));
     }
 
     public UserResponse getUserResponseById(Long id) {

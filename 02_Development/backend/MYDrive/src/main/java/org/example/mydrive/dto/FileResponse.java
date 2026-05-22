@@ -24,7 +24,7 @@ public record FileResponse(
                 e.getOriginalFileName(),
                 e.getType(),
                 e.getSize(),
-                e.getParent().getId(),
+                e.getParent() != null ? e.getParent().getId() : null,
                 owner,
                 e.getUploadDate(),
                 e.getLastModifiedDate(),

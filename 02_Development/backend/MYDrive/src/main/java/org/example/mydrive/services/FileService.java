@@ -1,5 +1,6 @@
 package org.example.mydrive.services;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.mydrive.dto.FileCreateRequest;
@@ -7,89 +8,126 @@ import org.example.mydrive.dto.FileResponse;
 import org.example.mydrive.dto.FileUpdateRequest;
 import org.example.mydrive.entities.FileEntity;
 import org.example.mydrive.entities.FolderEntity;
+import org.example.mydrive.entities.UserEntity;
 import org.example.mydrive.repositories.FileRepository;
+import org.example.mydrive.repositories.FolderRepository;
+import org.example.mydrive.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.PathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class FileService {
+
+    @Value("${app.storage.path}")
+    private String storagePath;
+
     private final FileRepository fileRepository;
+    private final FolderRepository folderRepository;
+    private final UserRepository userRepository;
+
+    @PostConstruct
+    public void init() throws IOException {
+        Files.createDirectories(Path.of(storagePath));
+    }
 
     @Transactional(readOnly = true)
     public FileResponse getById(Long id) {
-        FileEntity entity = fileRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("File not found: " + id));
-        return FileResponse.from(entity);
+        return FileResponse.from(findFile(id));
     }
 
     @Transactional(readOnly = true)
     public List<FileResponse> listByFolder(Long folderId) {
-        // Change this to match your repository method:
-        // e.g. findAllByFolderIdAndDeletedAtIsNullOrderByCreatedAtDesc(...)
         return fileRepository.findAllByParentId(folderId).stream()
                 .map(FileResponse::from)
                 .toList();
     }
 
+    public FileResponse upload(MultipartFile file, Long parentFolderId, Long ownerId) throws IOException {
+        UserEntity owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + ownerId));
+
+        String uniqueName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path target = Path.of(storagePath, uniqueName);
+        Files.copy(file.getInputStream(), target);
+
+        FolderEntity parent = null;
+        if (parentFolderId != null) {
+            parent = folderRepository.findById(parentFolderId)
+                    .orElseThrow(() -> new EntityNotFoundException("Folder not found: " + parentFolderId));
+        }
+
+        FileEntity entity = FileEntity.builder()
+                .originalFileName(file.getOriginalFilename())
+                .uniqueName(uniqueName)
+                .type(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
+                .size(file.getSize())
+                .owner(owner)
+                .parent(parent)
+                .isDeleted(false)
+                .build();
+
+        return FileResponse.from(fileRepository.save(entity));
+    }
+
+    public record DownloadResult(PathResource resource, String originalName, String mimeType) {}
+
+    @Transactional(readOnly = true)
+    public DownloadResult getDownloadResource(Long id) {
+        FileEntity entity = findFile(id);
+        Path filePath = Path.of(storagePath, entity.getUniqueName());
+        return new DownloadResult(
+                new PathResource(filePath),
+                entity.getOriginalFileName(),
+                entity.getType());
+    }
+
     public FileResponse create(FileCreateRequest req) {
         FileEntity entity = new FileEntity();
-
-        //TODO: Map fields (adjust to your entity):
-//        entity.setName(req.name());
-//        entity.setFolderId(req.folderId());
-//        entity.setMimeType(req.mimeType());
-//        entity.setSizeBytes(req.sizeBytes());
-//        entity.setStorageKey(req.storageKey());
-//        entity.setCreatedAt(Instant.now());
-//        entity.setUpdatedAt(Instant.now());
-
-        FileEntity saved = fileRepository.save(entity);
-        return FileResponse.from(saved);
+        entity.setIsDeleted(false);
+        return FileResponse.from(fileRepository.save(entity));
     }
 
     public FileResponse update(Long id, FileUpdateRequest req) {
-        FileEntity entity = fileRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("File not found: " + id));
-
-        // Allow rename, etc. (adjust):
+        FileEntity entity = findFile(id);
         if (req.name() != null && !req.name().isBlank()) {
-            entity.setUniqueName(req.name());
+            entity.setOriginalFileName(req.name());
         }
-        entity.setLastModifiedDate(LocalDateTime.from(Instant.now()));
-
         return FileResponse.from(fileRepository.save(entity));
     }
 
     public FileResponse move(Long id, Long targetFolderId) {
-        FileEntity entity = fileRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("File not found: " + id));
-        Optional<FileEntity> targetFolder = fileRepository.findById(targetFolderId);
-        if (targetFolder.isEmpty()) {
-            throw new EntityNotFoundException("Folder not found: " + targetFolderId);
-        }
-        entity.setParent(targetFolder.get().getParent());
-        entity.setLastModifiedDate(LocalDateTime.from(Instant.now()));
-
+        FileEntity entity = findFile(id);
+        FolderEntity folder = folderRepository.findById(targetFolderId)
+                .orElseThrow(() -> new EntityNotFoundException("Folder not found: " + targetFolderId));
+        entity.setParent(folder);
         return FileResponse.from(fileRepository.save(entity));
     }
 
     public void delete(Long id) {
-        // Choose: hard delete OR soft delete
-        // HARD:
-        // fileRepository.deleteById(id);
-
-        // SOFT (recommended):
-        FileEntity entity = fileRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("File not found: " + id));
-//        entity.set(Instant.now());
-        entity.setLastModifiedDate(LocalDateTime.from(Instant.now()));
+        FileEntity entity = findFile(id);
+        entity.setIsDeleted(true);
         fileRepository.save(entity);
+
+        try {
+            Files.deleteIfExists(Path.of(storagePath, entity.getUniqueName()));
+        } catch (IOException ignored) {}
+    }
+
+    private FileEntity findFile(Long id) {
+        return fileRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("File not found: " + id));
     }
 }

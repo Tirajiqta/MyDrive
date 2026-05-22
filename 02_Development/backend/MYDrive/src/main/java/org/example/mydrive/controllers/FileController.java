@@ -6,8 +6,14 @@ import org.example.mydrive.dto.FileResponse;
 import org.example.mydrive.dto.FileUpdateRequest;
 import org.example.mydrive.dto.MoveFileRequest;
 import org.example.mydrive.services.FileService;
+import org.example.mydrive.utils.GeneralUtils;
+import org.springframework.core.io.PathResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -48,5 +54,23 @@ public class FileController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         fileService.delete(id);
+    }
+
+    @PostMapping("/upload")
+    @ResponseStatus(HttpStatus.CREATED)
+    public FileResponse upload(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "parentId", required = false) Long parentId) throws Exception {
+        return fileService.upload(file, parentId, GeneralUtils.getIdFromToken());
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<PathResource> download(@PathVariable Long id) throws Exception {
+        FileService.DownloadResult result = fileService.getDownloadResource(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + result.originalName() + "\"")
+                .contentType(MediaType.parseMediaType(result.mimeType()))
+                .body(result.resource());
     }
 }

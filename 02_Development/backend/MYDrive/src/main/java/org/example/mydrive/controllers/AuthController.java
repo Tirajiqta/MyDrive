@@ -20,7 +20,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse register(@Valid @RequestBody UserRegisterRequest req) {
+    public AuthTokensResponse register(@Valid @RequestBody UserRegisterRequest req) {
         return authService.register(req);
     }
 
