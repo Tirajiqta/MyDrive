@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CloudIcon,
+  CreditCard,
   FolderOpen,
   Link2,
   LogOut,
@@ -17,6 +18,7 @@ import { useRouter } from "next/navigation";
 const navItems = [
   { href: "/drive", icon: FolderOpen, label: "My Drive" },
   { href: "/shares", icon: Link2, label: "Shared Links" },
+  { href: "/subscription", icon: CreditCard, label: "Subscription" },
   { href: "/settings", icon: Settings, label: "Settings" },
 ];
 

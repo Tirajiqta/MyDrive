@@ -1,18 +1,51 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
 from docx import Document
 from docx.shared import Pt, RGBColor, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.section import WD_SECTION
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
 doc = Document()
 
+# --- Базов (Normal) стил: Times New Roman, 12 pt, междуредие 1.5 ---
+normal = doc.styles['Normal']
+normal.font.name = 'Times New Roman'
+normal.font.size = Pt(12)
+normal.paragraph_format.line_spacing = 1.5
+
 section = doc.sections[0]
+# A4 формат (21.0 cm x 29.7 cm)
+section.page_width  = Cm(21.0)
+section.page_height = Cm(29.7)
 section.top_margin    = Cm(2.5)
 section.bottom_margin = Cm(2.5)
 section.left_margin   = Cm(3)
 section.right_margin  = Cm(2)
+
+
+def add_page_numbers(section):
+    """Номерация на страниците: долу, в дясно, с арабски цифри."""
+    p = section.footer.paragraphs[0]
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    run = p.add_run()
+    fld_begin = OxmlElement('w:fldChar')
+    fld_begin.set(qn('w:fldCharType'), 'begin')
+    instr = OxmlElement('w:instrText')
+    instr.set(qn('xml:space'), 'preserve')
+    instr.text = 'PAGE'
+    fld_end = OxmlElement('w:fldChar')
+    fld_end.set(qn('w:fldCharType'), 'end')
+    run._r.append(fld_begin)
+    run._r.append(instr)
+    run._r.append(fld_end)
+    run.font.name = 'Times New Roman'
+    run.font.size = Pt(12)
+
+
+add_page_numbers(section)
 
 def set_font(run, bold=False, size=12, color=None):
     run.bold = bold
@@ -22,34 +55,42 @@ def set_font(run, bold=False, size=12, color=None):
         run.font.color.rgb = RGBColor(*color)
 
 def heading1(text):
+    # Раздел: главни букви, центрирано, удебелено, 14 pt (notes.txt)
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(18)
-    p.paragraph_format.space_after  = Pt(6)
-    run = p.add_run(text)
-    set_font(run, bold=True, size=16, color=(0x2C, 0x3E, 0x50))
-    p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p.paragraph_format.space_after  = Pt(12)
+    p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p.add_run(text.upper())
+    set_font(run, bold=True, size=14)
     return p
 
 def heading2(text):
+    # Параграф: удебелено, 14 pt, отстъп 1.25 cm от лявото поле (notes.txt)
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(12)
     p.paragraph_format.space_after  = Pt(4)
+    p.paragraph_format.left_indent = Cm(1.25)
     run = p.add_run(text)
-    set_font(run, bold=True, size=14, color=(0x1A, 0x5E, 0x8A))
+    set_font(run, bold=True, size=14)
     return p
 
 def heading3(text):
+    # Подпараграф: удебелено, 13 pt, отстъп 2.0 cm от лявото поле (notes.txt)
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(8)
     p.paragraph_format.space_after  = Pt(2)
+    p.paragraph_format.left_indent = Cm(2.0)
     run = p.add_run(text)
-    set_font(run, bold=True, size=12, color=(0x2E, 0x86, 0xAB))
+    set_font(run, bold=True, size=13)
     return p
 
 def body(text, italic=False):
+    # Основен текст: TNR 12 pt, двустранно подравнен, отстъп 1.25 cm, междуредие 1.5
     p = doc.add_paragraph()
     p.paragraph_format.space_after = Pt(6)
-    p.paragraph_format.first_line_indent = Cm(1)
+    p.paragraph_format.first_line_indent = Cm(1.25)
+    p.paragraph_format.line_spacing = 1.5
+    p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     run = p.add_run(text)
     run.font.name = 'Times New Roman'
     run.font.size = Pt(12)
@@ -58,6 +99,8 @@ def body(text, italic=False):
 
 def bullet(text):
     p = doc.add_paragraph(style='List Bullet')
+    p.paragraph_format.line_spacing = 1.5
+    p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     run = p.add_run(text)
     run.font.name = 'Times New Roman'
     run.font.size = Pt(12)
@@ -130,13 +173,13 @@ def page_break():
 p = doc.add_paragraph()
 p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
 p.paragraph_format.space_before = Pt(60)
-run = p.add_run('ТЕХНИЧЕСКИ УНИВЕРСИТЕТ')
-set_font(run, bold=True, size=16)
+run = p.add_run('ТЕХНИЧЕСКИ УНИВЕРСИТЕТ – СОФИЯ')
+set_font(run, bold=True, size=18)
 
 p = doc.add_paragraph()
 p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run('Факултет по Компютърни системи и технологии')
-set_font(run, bold=False, size=13)
+run = p.add_run('ФАКУЛТЕТ „КОМПЮТЪРНИ СИСТЕМИ И ТЕХНОЛОГИИ"')
+set_font(run, bold=True, size=16)
 
 doc.add_paragraph()
 doc.add_paragraph()
@@ -144,19 +187,14 @@ doc.add_paragraph()
 p = doc.add_paragraph()
 p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
 run = p.add_run('ДИПЛОМНА РАБОТА')
-set_font(run, bold=True, size=20, color=(0x1A, 0x5E, 0x8A))
+set_font(run, bold=True, size=14)
 
 doc.add_paragraph()
 
 p = doc.add_paragraph()
 p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run('MyDrive')
-set_font(run, bold=True, size=28, color=(0x2C, 0x3E, 0x50))
-
-p = doc.add_paragraph()
-p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run('Облачна платформа за съхранение и управление на документи')
-set_font(run, bold=False, size=15, color=(0x2E, 0x86, 0xAB))
+run = p.add_run('MYDRIVE – ОБЛАЧНА ПЛАТФОРМА ЗА СЪХРАНЕНИЕ\nИ УПРАВЛЕНИЕ НА ДОКУМЕНТИ')
+set_font(run, bold=True, size=20)
 
 doc.add_paragraph()
 doc.add_paragraph()
@@ -165,19 +203,21 @@ doc.add_paragraph()
 p = doc.add_paragraph()
 p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
 run = p.add_run('Дипломант: Слави Овчаров Николаев')
-set_font(run, bold=False, size=13)
+set_font(run, bold=True, size=14)
 
 p = doc.add_paragraph()
 p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
 run = p.add_run('Специалност: Компютърни системи и технологии')
-set_font(run, bold=False, size=13)
+set_font(run, bold=True, size=14)
 
+doc.add_paragraph()
+doc.add_paragraph()
 doc.add_paragraph()
 
 p = doc.add_paragraph()
 p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run('2026 г.')
-set_font(run, bold=False, size=13)
+run = p.add_run('София, 2026 г.')
+set_font(run, bold=True, size=14)
 
 page_break()
 
@@ -187,6 +227,7 @@ page_break()
 
 heading1('СЪДЪРЖАНИЕ')
 toc_items = [
+    ('', 'УВОД'),
     ('1.', 'ОПИСАНИЕ НА РЕШАВАНИЯ ПРОБЛЕМ'),
     ('  1.1.', 'Контекст и мотивация'),
     ('  1.2.', 'Съществуващи решения и техните ограничения'),
@@ -216,15 +257,52 @@ toc_items = [
     ('  4.6.', 'Електронно подписване на PDF'),
     ('  4.7.', 'AI Асистент'),
     ('  4.8.', 'Управление на профила и абонамента'),
+    ('', 'ЗАКЛЮЧЕНИЕ'),
+    ('', 'СПИСЪК НА ИЗПОЛЗВАНИТЕ ЛИТЕРАТУРНИ ИЗТОЧНИЦИ'),
 ]
 for num, title in toc_items:
     p = doc.add_paragraph()
     p.paragraph_format.space_after = Pt(2)
-    run = p.add_run(num + '  ' + title)
+    run = p.add_run((num + ' ' + title).strip())
     run.font.name = 'Times New Roman'
     run.font.size = Pt(12)
     if not num.startswith('  '):
         run.bold = True
+
+page_break()
+
+# ==============================================================================
+# УВОД
+# ==============================================================================
+
+heading1('УВОД')
+
+body(
+    'Настоящата дипломна работа представя проектирането и програмната реализация '
+    'на MyDrive -- самостоятелно управлявана (self-hosted) облачна платформа за '
+    'съхранение и управление на документи. В процеса на дипломното проектиране бяха '
+    'анализирани съществуващите решения на пазара, формулирани бяха функционалните и '
+    'нефункционалните изисквания към системата и беше синтезирана многослойна '
+    'архитектура, разделяща отговорностите между отделните компоненти.'
+)
+
+body(
+    'В рамките на разработката бяха реализирани: REST API на база Spring Boot 3 с '
+    'JWT автентикация; отделен файлов микросървис на езика Go; уеб клиент с Next.js 15 '
+    'и React 19; релационна база данни MySQL за метаданните; реално-времево съвместно '
+    'редактиране на документи чрез протокола STOMP над WebSocket; електронно подписване '
+    'на PDF документи по стандарта PAdES-B-B, съвместим с регламента eIDAS; '
+    'и интегриран AI асистент на база GPT-4o mini.'
+)
+
+body(
+    'Обяснителната записка е структурирана в четири глави. Първата глава описва '
+    'решавания инженерен проблем, целите и обхвата на системата. Втората глава представя '
+    'архитектурата на проекта, схемата на базата данни и инфраструктурата за разгръщане. '
+    'Третата глава съдържа подробно описание на изходния код по компоненти. Четвъртата '
+    'глава представлява ръководство за крайния потребител. В заключението са обобщени '
+    'постигнатите резултати и насоките за бъдещо развитие.'
+)
 
 page_break()
 
@@ -1487,10 +1565,59 @@ body(
     'и versioning на документи.'
 )
 
+page_break()
+
+# ==============================================================================
+# СПИСЪК НА ИЗПОЛЗВАНИТЕ ЛИТЕРАТУРНИ ИЗТОЧНИЦИ
+# ==============================================================================
+
+heading1('СПИСЪК НА ИЗПОЛЗВАНИТЕ ЛИТЕРАТУРНИ ИЗТОЧНИЦИ')
+
+def reference(idx, text):
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(4)
+    p.paragraph_format.line_spacing = 1.5
+    p.paragraph_format.left_indent = Cm(0.75)
+    p.paragraph_format.first_line_indent = Cm(-0.75)  # висящ отстъп
+    p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    run = p.add_run('[' + str(idx) + '] ' + text)
+    run.font.name = 'Times New Roman'
+    run.font.size = Pt(12)
+    return p
+
+references = [
+    'Регламент (ЕС) № 910/2014 на Европейския парламент и на Съвета относно '
+    'електронната идентификация и удостоверителните услуги (eIDAS). Официален вестник '
+    'на ЕС, 2014.',
+    'ETSI EN 319 142-1. Electronic Signatures and Infrastructures (ESI); PAdES digital '
+    'signatures; Part 1: Building blocks and PAdES baseline signatures.',
+    'Spring Boot Reference Documentation. Pivotal/VMware. '
+    'https://docs.spring.io/spring-boot/',
+    'Spring Security Reference Documentation. '
+    'https://docs.spring.io/spring-security/reference/',
+    'Next.js Documentation. Vercel. https://nextjs.org/docs',
+    'React Documentation. Meta Open Source. https://react.dev/',
+    'MySQL 8.0 Reference Manual. Oracle Corporation. '
+    'https://dev.mysql.com/doc/refman/8.0/en/',
+    'Apache PDFBox -- A Java PDF Library. The Apache Software Foundation. '
+    'https://pdfbox.apache.org/',
+    'The Legion of the Bouncy Castle Java Cryptography APIs. '
+    'https://www.bouncycastle.org/',
+    'Jones, M., Bradley, J., Sakimura, N. RFC 7519: JSON Web Token (JWT). IETF, 2015.',
+    'STOMP Protocol Specification, Version 1.2. https://stomp.github.io/',
+    'OpenAI API Reference. OpenAI. https://platform.openai.com/docs/api-reference',
+    'Docker Documentation. Docker Inc. https://docs.docker.com/',
+    'nginx documentation. https://nginx.org/en/docs/',
+    'The Go Programming Language Documentation. https://go.dev/doc/',
+]
+for i, ref in enumerate(references, start=1):
+    reference(i, ref)
+
 # ==============================================================================
 # SAVE
 # ==============================================================================
 
-out = '/home/slavi/uni/diplomna/MyDrive/MyDrive_Dokumentaciq.docx'
+out = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                   'MyDrive_Dokumentaciq.docx')
 doc.save(out)
 print('Saved: ' + out)

@@ -1,0 +1,28 @@
+# Build output (rebuilt inside the image)
+target/
+
+# IDE / tooling
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+
+# Maven wrapper (the build stage uses the maven base image instead)
+.mvn/
+mvnw
+mvnw.cmd
+
+# VCS & docs
+.git/
+.gitignore
+.gitattributes
+HELP.md
+*.postman_collection.json
+
+# Local env files — never bake secrets into the image
+.env
+*.env
