@@ -248,6 +248,7 @@ toc_items = [
     ('  3.4.', 'Реално-времево съвместно редактиране (WebSocket)'),
     ('  3.5.', 'Електронно подписване на документи (eIDAS PAdES)'),
     ('  3.6.', 'AI Чатбот'),
+    ('  3.7.', 'Платежна интеграция и абонаменти (Stripe)'),
     ('4.', 'РЪКОВОДСТВО ЗА ПОТРЕБИТЕЛЯ'),
     ('  4.1.', 'Регистрация и вход в системата'),
     ('  4.2.', 'Управление на папки и файлове'),
@@ -257,6 +258,11 @@ toc_items = [
     ('  4.6.', 'Електронно подписване на PDF'),
     ('  4.7.', 'AI Асистент'),
     ('  4.8.', 'Управление на профила и абонамента'),
+    ('5.', 'ТЕСТВАНЕ НА СИСТЕМАТА'),
+    ('  5.1.', 'Подход и инструменти'),
+    ('  5.2.', 'Покрити модули и сценарии'),
+    ('  5.3.', 'Примерен модулен тест'),
+    ('  5.4.', 'Изпълнение на тестовете'),
     ('', 'ЗАКЛЮЧЕНИЕ'),
     ('', 'СПИСЪК НА ИЗПОЛЗВАНИТЕ ЛИТЕРАТУРНИ ИЗТОЧНИЦИ'),
 ]
@@ -432,8 +438,8 @@ body(
 )
 
 body('Ключови пакети и класове:')
-bullet('controllers/ -- HTTP контролери: AuthController, FileController, FolderController, ShareController, CollaborationController, DocumentSigningController.')
-bullet('services/ -- бизнес логика: AuthService, FileService, ShareService, DocumentSigningService, OpenAIService, JwtService, PasswordService.')
+bullet('controllers/ -- HTTP контролери: AuthController, FileController, FolderController, ShareController, CollaborationController, DocumentSigningController, SubscriptionController.')
+bullet('services/ -- бизнес логика: AuthService, FileService, ShareService, DocumentSigningService, OpenAIService, JwtService, PasswordService, SubscriptionService.')
 bullet('entities/ -- JPA обекти, директно мапирани към таблици в MySQL.')
 bullet('repositories/ -- Spring Data JPA репозитории.')
 bullet('utils/ -- SecurityConfig (Spring Security), JobScheduler, GeneralUtils, TokenUtil.')
@@ -464,6 +470,7 @@ bullet('/forgot-password, /reset-password -- Управление на паро�
 bullet('/drive -- Основен изглед: всички root папки на потребителя.')
 bullet('/drive/folder/[id] -- Съдържание на конкретна папка.')
 bullet('/shares -- Управление на всички споделяния.')
+bullet('/subscription -- Избор на абонаментен план и плащане през Stripe Checkout.')
 bullet('/settings -- Профил и абонамент.')
 bullet('/share/[token] -- Публична страница за споделена връзка.')
 
@@ -515,7 +522,7 @@ add_table(
         ['endDate', 'DATETIME NULL', 'Край (null = активен)'],
         ['status', 'VARCHAR(50) NOT NULL', 'ACTIVE / EXPIRED / CANCELLED'],
         ['renewalDate', 'DATETIME NULL', 'Дата на следващо подновяване'],
-        ['paymentMethodId', 'VARCHAR NULL', 'ID на платежен метод в payment gateway'],
+        ['paymentMethodId', 'VARCHAR NULL', 'ID на Stripe Checkout сесията, потвърдила плащането'],
     ]
 )
 
@@ -1257,6 +1264,57 @@ body(
 
 diagram_placeholder('AI chatbot widget and flow')
 
+heading2('3.7. Платежна интеграция и абонаменти (Stripe)')
+
+body(
+    'MyDrive предлага три абонаментни плана -- Free, Pro и Business -- които '
+    'определят лимита за съхранение на потребителя. Платежната обработка е '
+    'реализирана чрез Stripe Checkout, така че чувствителните картови данни '
+    'никога не достигат до сървърите на MyDrive и не се съхраняват в базата данни. '
+    'По този начин системата остава извън обхвата на голяма част от изискванията '
+    'на PCI DSS.'
+)
+
+body(
+    'Плановете са дефинирани централизирано във frontend модула lib/plans.ts '
+    '(цена в най-малката единица на валутата, валута, лимит за съхранение и '
+    'характеристики). Цените се изграждат динамично чрез Stripe price_data при '
+    'създаване на сесията, поради което не е необходимо предварително '
+    'конфигуриране на продукти в Stripe Dashboard -- достатъчен е тестов таен '
+    'ключ (sk_test_...).'
+)
+
+body('Процесът на плащане преминава през следните стъпки:')
+bullet('Потребителят избира план на страницата /subscription и натиска "Subscribe".')
+bullet('Браузърът извиква Next.js route handler POST /api/checkout, който чрез сървърния Stripe клиент (lib/stripe.ts) създава Checkout сесия в режим subscription и връща нейния URL.')
+bullet('Потребителят се пренасочва към хостваната от Stripe платежна страница, където въвежда картовите си данни.')
+bullet('След успешно плащане Stripe връща потребителя на /subscription?status=success с session_id; при отказ -- на ?status=canceled, без да е извършено плащане.')
+bullet('Frontend извиква GET /api/checkout/session, за да потвърди статуса на сесията (status = complete), и едва тогава изпраща POST /api/subscription/activate към Spring Boot бекенда.')
+bullet('SubscriptionService.activatePlan() намира плана по вътрешно име, актуализира (или създава) единствения ред в user_subscriptions за потребителя, задава статус ACTIVE, нова дата на подновяване и записва ID-то на Stripe сесията в колоната paymentMethodId.')
+
+body(
+    'Бекендът поддържа стриктно отношение едно-към-едно между потребител и '
+    'активен абонамент: при смяна на план съществуващият ред се преизползва, '
+    'така че потребителят никога не разполага с повече от един активен абонамент. '
+    'Съответствието между публичните идентификатори на плановете (free, pro, '
+    'business) и вътрешните имена (FREE_PLAN, PRO_PLAN, BUSINESS_PLAN) се '
+    'извършва чрез карта на псевдоними в SubscriptionService.'
+)
+
+code_block(
+    '// Активиране на план след успешно плащане (SubscriptionService)\n'
+    'String internalName = PLAN_ALIASES.getOrDefault(planRef.toLowerCase(), planRef);\n'
+    'PlanEntity plan = planRepository\n'
+    '        .findByInternalNameAndIsActiveTrue(internalName)\n'
+    '        .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, ...));\n'
+    'sub.setPlanEntity(plan);\n'
+    'sub.setStatus("ACTIVE");\n'
+    'sub.setRenewalDate(LocalDateTime.now().plusMonths(1));\n'
+    'sub.setPaymentMethodId(stripeSessionId);'
+)
+
+diagram_placeholder('Stripe Checkout subscription flow')
+
 page_break()
 
 # ==============================================================================
@@ -1516,11 +1574,126 @@ heading3('4.8.2. Информация за абонамента')
 body(
     'В секция Subscription се показва текущият абонаментен план, '
     'лимитът за съхранение и изразходваното пространство '
-    'чрез визуална лента (StorageBar). '
-    'За промяна на плана се свържете с администратора на системата.'
+    'чрез визуална лента (StorageBar).'
 )
 
-diagram_placeholder('settings page and storage bar screenshot')
+heading3('4.8.3. Смяна на план и плащане')
+
+bullet('Отворете страницата /subscription, за да разгледате наличните планове (Pro и Business) с техните цени и характеристики.')
+bullet('Натиснете "Subscribe" под желания план -- ще бъдете пренасочени към защитената платежна страница на Stripe.')
+bullet('Въведете картовите си данни. В тестов режим може да се използва тестовата карта 4242 4242 4242 4242 с произволна бъдеща дата и CVC.')
+bullet('След успешно плащане се връщате автоматично в MyDrive, новият план се активира незабавно и лимитът за съхранение се обновява.')
+bullet('Ако откажете плащането, не се извършва никаква транзакция и абонаментът остава непроменен.')
+
+diagram_placeholder('subscription page, Stripe checkout and storage bar screenshot')
+
+page_break()
+
+# ==============================================================================
+# CHAPTER 5 -- TESTING
+# ==============================================================================
+
+heading1('5. ТЕСТВАНЕ НА СИСТЕМАТА')
+
+body(
+    'Коректността на бизнес логиката на бекенда е осигурена чрез набор от '
+    'автоматизирани модулни тестове (unit tests). Тестовете покриват критичните '
+    'услуги -- автентикация, управление на пароли, папки, абонаменти, поддръжка '
+    'и помощни класове -- като се фокусират върху граничните случаи и '
+    'обработката на грешки, а не само върху "щастливия" сценарий.'
+)
+
+heading2('5.1. Подход и инструменти')
+
+body(
+    'Тестовете следват подхода на изолирано модулно тестване: всеки сервиз се '
+    'тества самостоятелно, а зависимостите му (репозитории, кодиращи пароли, '
+    'мейл-подаватели и др.) се заместват с mock обекти. По този начин тестовете '
+    'са бързи, детерминирани и не изискват реална база данни или външни услуги.'
+)
+
+body('Използваният технологичен стек за тестване включва:')
+bullet('JUnit 5 (Jupiter) -- основна рамка за дефиниране и изпълнение на тестовете.')
+bullet('Mockito -- създаване на mock обекти и проверка на взаимодействията (verify, ArgumentCaptor) чрез разширението MockitoExtension.')
+bullet('AssertJ -- изразителни, четими твърдения от вида assertThat(...).isEqualTo(...) и assertThatThrownBy(...).')
+bullet('spring-boot-starter-test -- агрегиращата зависимост, която доставя горните библиотеки, заедно с интеграционния тест MyDriveApplicationTests за проверка на зареждането на Spring контекста.')
+
+heading2('5.2. Покрити модули и сценарии')
+
+body(
+    'Следната таблица обобщава тестовите класове, тестваните компоненти и '
+    'броя на покритите сценарии (тестови методи):'
+)
+
+add_table(
+    ['Тестов клас', 'Тестван компонент', 'Брой тестове', 'Основни сценарии'],
+    [
+        ['AuthServiceTest', 'AuthService', '20', 'Вход с email/потребителско име, ротация и отнемане на refresh токени, регистрация, конфликти, смяна на език'],
+        ['PasswordServiceTest', 'PasswordService', '9', 'Забравена/нулирана/сменена парола, изтекли и вече използвани токени'],
+        ['FolderServiceTest', 'FolderService', '17', 'Създаване, преименуване, преместване (вкл. в собствен наследник), soft delete, дублирани имена'],
+        ['SubscriptionServiceTest', 'SubscriptionService', '8', 'Активни планове, активиране/смяна на абонамент, псевдоними на планове, неизвестни планове'],
+        ['SupportTicketServiceTest', 'SupportTicketService', '8', 'Създаване на тикети, приоритети по подразбиране, контрол на достъпа'],
+        ['FaqServiceTest', 'FaqService', '7', 'Локализация на често задавани въпроси, fallback към английски, сортиране'],
+        ['JwtServiceTest', 'JwtService', '4', 'Генериране на JWT, subject/uid claim, срок на валидност, подпис'],
+        ['UserMapperTest', 'UserMapper', '5', 'Мапиране entity<->DTO, разрешаване на лимит и език от активния план'],
+        ['GeneralUtilsTest', 'GeneralUtils', '2', 'Извличане на потребителско ID от JWT в security контекста'],
+        ['TokenUtilTest', 'TokenUtil', '6', 'Генериране на opaque токени и SHA-256 хеширане'],
+        ['MyDriveApplicationTests', 'Spring контекст', '1', 'Успешно зареждане на приложния контекст'],
+    ]
+)
+
+body(
+    'Общо тестовете обхващат около 87 сценария върху десетте основни услуги и '
+    'помощни класа на бекенда, с акцент върху обработката на изключения '
+    '(ResponseStatusException, EntityNotFoundException) и правилните HTTP '
+    'статус кодове.'
+)
+
+heading2('5.3. Примерен модулен тест')
+
+body(
+    'Примерът по-долу илюстрира типичната структура на тест по схемата '
+    'Arrange-Act-Assert: подготвят се mock-ове, извиква се тестваният метод и '
+    'чрез ArgumentCaptor се проверява какво е било записано в базата данни.'
+)
+
+code_block(
+    '@Test\n'
+    'void activatePlan_mapsAliasAndCreatesSubscriptionWhenNoneExists() {\n'
+    '    PlanEntity pro = plan(2L, "PRO_PLAN", true);\n'
+    '    when(userRepository.findById(1L)).thenReturn(Optional.of(user));\n'
+    '    when(planRepository.findByInternalNameAndIsActiveTrue("PRO_PLAN"))\n'
+    '            .thenReturn(Optional.of(pro));\n'
+    '    when(userSubscriptionRepository.save(any())).thenAnswer(i -> i.getArgument(0));\n'
+    '\n'
+    '    UserSubscriptionResponse res =\n'
+    '            subscriptionService.activatePlan(1L, "pro", "sess_123");\n'
+    '\n'
+    '    assertThat(res.status()).isEqualTo("ACTIVE");\n'
+    '    ArgumentCaptor<UserSubscriptionEntity> captor =\n'
+    '            ArgumentCaptor.forClass(UserSubscriptionEntity.class);\n'
+    '    verify(userSubscriptionRepository).save(captor.capture());\n'
+    '    assertThat(captor.getValue().getPlanEntity()).isEqualTo(pro);\n'
+    '    assertThat(captor.getValue().getPaymentMethodId()).isEqualTo("sess_123");\n'
+    '}'
+)
+
+heading2('5.4. Изпълнение на тестовете')
+
+body(
+    'Тестовете се изпълняват чрез Maven Surefire plugin с командата по-долу. '
+    'Те се стартират автоматично и при всяко изграждане на проекта (mvn package), '
+    'което гарантира, че регресии се откриват преди разгръщане.'
+)
+
+code_block(
+    '# Изпълнение на всички тестове\n'
+    'cd 02_Development/backend/MYDrive\n'
+    './mvnw test\n'
+    '\n'
+    '# Изпълнение на конкретен тестов клас\n'
+    './mvnw test -Dtest=SubscriptionServiceTest'
+)
 
 page_break()
 
@@ -1553,14 +1726,23 @@ body(
     'Механизмът за сигурност следва добрите практики: '
     'BCrypt за хеширане на пароли, stateless JWT автентикация с token rotation, '
     'SHA-256 хеширане на refresh и share токени преди запис в БД, '
-    'Spring Security с OAuth2 Resource Server за валидация на JWT.'
+    'Spring Security с OAuth2 Resource Server за валидация на JWT. '
+    'Монетизацията е реализирана чрез интеграция със Stripe Checkout, '
+    'при която картови данни не се съхраняват в системата.'
+)
+
+body(
+    'Надеждността на бизнес логиката е подсигурена чрез набор от автоматизирани '
+    'модулни тестове (JUnit 5, Mockito, AssertJ), покриващи критичните услуги на '
+    'бекенда -- автентикация, управление на пароли, папки и абонаменти -- с '
+    'акцент върху граничните случаи и обработката на грешки.'
 )
 
 body(
     'В бъдещи версии на системата се планира: '
     'мобилно приложение (React Native), '
     'интеграция с квалифициран TSP за QES (Qualified Electronic Signature) подписване, '
-    'платежна интеграция за абонаментните планове, '
+    'обработка на Stripe webhook събития за автоматично подновяване и отмяна на абонаменти, '
     'CRDT-базирано разрешаване на конфликти при едновременно редактиране '
     'и versioning на документи.'
 )
@@ -1606,6 +1788,10 @@ references = [
     'Jones, M., Bradley, J., Sakimura, N. RFC 7519: JSON Web Token (JWT). IETF, 2015.',
     'STOMP Protocol Specification, Version 1.2. https://stomp.github.io/',
     'OpenAI API Reference. OpenAI. https://platform.openai.com/docs/api-reference',
+    'Stripe API Reference & Stripe Checkout Documentation. Stripe, Inc. '
+    'https://stripe.com/docs/api',
+    'JUnit 5 User Guide. https://junit.org/junit5/docs/current/user-guide/',
+    'Mockito Documentation. https://site.mockito.org/',
     'Docker Documentation. Docker Inc. https://docs.docker.com/',
     'nginx documentation. https://nginx.org/en/docs/',
     'The Go Programming Language Documentation. https://go.dev/doc/',
