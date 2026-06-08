@@ -1,13 +1,15 @@
-package org.example.mydrive;
+package org.example.mydrive.config;
 
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class OpenAICоnfig {
-    private final String apiKey = "";
+public class OpenAIConfig {
+
+    @Value("${openai.api.key:}")
+    private String apiKey;
 
     @Bean
     public WebClient openAIWebClient() {

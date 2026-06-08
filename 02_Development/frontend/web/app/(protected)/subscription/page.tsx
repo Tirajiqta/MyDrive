@@ -8,6 +8,8 @@ import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { PLANS, formatPrice, type Plan, type PlanId } from "@/lib/plans";
+import { subscriptionApi } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SessionInfo {
   status: string;
@@ -77,6 +79,7 @@ function PlanCard({
 function SubscriptionContent() {
   const router = useRouter();
   const params = useSearchParams();
+  const { refreshUser } = useAuth();
   const status = params.get("status");
   const sessionId = params.get("session_id");
 
@@ -92,9 +95,27 @@ function SubscriptionContent() {
     if (status === "success" && sessionId) {
       fetch(`/api/checkout/session?session_id=${encodeURIComponent(sessionId)}`)
         .then((r) => r.json())
-        .then((data: SessionInfo) => {
-          if (data.status === "complete") setSession(data);
-          else toast.error("Payment not completed.");
+        .then(async (data: SessionInfo) => {
+          if (data.status !== "complete") {
+            toast.error("Payment not completed.");
+            return;
+          }
+          setSession(data);
+          // Persist the purchased plan on the backend so the user's storage
+          // limit actually changes, then refresh the cached user.
+          if (data.plan) {
+            try {
+              await subscriptionApi.activate({
+                plan: data.plan,
+                stripeSessionId: sessionId,
+              });
+              await refreshUser();
+            } catch {
+              toast.error(
+                "Payment succeeded but we couldn't update your plan. Contact support."
+              );
+            }
+          }
         })
         .catch(() => toast.error("Could not confirm your subscription."));
     }

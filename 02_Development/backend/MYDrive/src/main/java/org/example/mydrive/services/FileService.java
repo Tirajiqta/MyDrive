@@ -1,6 +1,5 @@
 package org.example.mydrive.services;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.mydrive.dto.FileCreateRequest;
@@ -12,18 +11,14 @@ import org.example.mydrive.entities.UserEntity;
 import org.example.mydrive.repositories.FileRepository;
 import org.example.mydrive.repositories.FolderRepository;
 import org.example.mydrive.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.PathResource;
+import org.example.mydrive.services.storage.StorageService;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,17 +26,10 @@ import java.util.UUID;
 @Transactional
 public class FileService {
 
-    @Value("${app.storage.path}")
-    private String storagePath;
-
     private final FileRepository fileRepository;
     private final FolderRepository folderRepository;
     private final UserRepository userRepository;
-
-    @PostConstruct
-    public void init() throws IOException {
-        Files.createDirectories(Path.of(storagePath));
-    }
+    private final StorageService storageService;
 
     @Transactional(readOnly = true)
     public FileResponse getById(Long id) {
@@ -59,9 +47,12 @@ public class FileService {
         UserEntity owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + ownerId));
 
-        String uniqueName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path target = Path.of(storagePath, uniqueName);
-        Files.copy(file.getInputStream(), target);
+        String originalName = file.getOriginalFilename();
+        if (originalName == null || originalName.isBlank()) {
+            originalName = "unnamed_file";
+        }
+        String uniqueName = UUID.randomUUID() + "_" + originalName;
+        storageService.store(uniqueName, file.getInputStream(), file.getSize());
 
         FolderEntity parent = null;
         if (parentFolderId != null) {
@@ -70,7 +61,7 @@ public class FileService {
         }
 
         FileEntity entity = FileEntity.builder()
-                .originalFileName(file.getOriginalFilename())
+                .originalFileName(originalName)
                 .uniqueName(uniqueName)
                 .type(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
                 .size(file.getSize())
@@ -82,14 +73,13 @@ public class FileService {
         return FileResponse.from(fileRepository.save(entity));
     }
 
-    public record DownloadResult(PathResource resource, String originalName, String mimeType) {}
+    public record DownloadResult(Resource resource, String originalName, String mimeType) {}
 
     @Transactional(readOnly = true)
     public DownloadResult getDownloadResource(Long id) {
         FileEntity entity = findFile(id);
-        Path filePath = Path.of(storagePath, entity.getUniqueName());
         return new DownloadResult(
-                new PathResource(filePath),
+                storageService.load(entity.getUniqueName()),
                 entity.getOriginalFileName(),
                 entity.getType());
     }
@@ -121,9 +111,9 @@ public class FileService {
         entity.setIsDeleted(true);
         fileRepository.save(entity);
 
-        try {
-            Files.deleteIfExists(Path.of(storagePath, entity.getUniqueName()));
-        } catch (IOException ignored) {}
+        if (entity.getUniqueName() != null) {
+            storageService.delete(entity.getUniqueName());
+        }
     }
 
     private FileEntity findFile(Long id) {

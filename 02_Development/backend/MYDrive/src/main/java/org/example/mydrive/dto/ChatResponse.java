@@ -1,4 +1,4 @@
-package org.example.mydrive.dtos;
+package org.example.mydrive.dto;
 
 import java.util.List;
 

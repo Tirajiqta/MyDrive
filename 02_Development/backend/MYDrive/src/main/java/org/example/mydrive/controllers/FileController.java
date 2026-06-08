@@ -7,7 +7,7 @@ import org.example.mydrive.dto.FileUpdateRequest;
 import org.example.mydrive.dto.MoveFileRequest;
 import org.example.mydrive.services.FileService;
 import org.example.mydrive.utils.GeneralUtils;
-import org.springframework.core.io.PathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -65,7 +65,7 @@ public class FileController {
     }
 
     @GetMapping("/{id}/download")
-    public ResponseEntity<PathResource> download(@PathVariable Long id) throws Exception {
+    public ResponseEntity<Resource> download(@PathVariable Long id) throws Exception {
         FileService.DownloadResult result = fileService.getDownloadResource(id);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,

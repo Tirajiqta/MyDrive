@@ -175,6 +175,15 @@ public class AuthService {
         return entity.map(this::toUserResponse).orElse(null);
     }
 
+    public UserResponse updatePreferredLanguage(Long userId, String code) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        var language = languageRepository.findByCode(code)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown language: " + code));
+        user.setPreferredLanguageEntity(language);
+        return toUserResponse(userRepository.save(user));
+    }
+
     private UserResponse toUserResponse(UserEntity u) {
         Integer storageLimitGb = null;
         String langCode = null;

@@ -1,4 +1,5 @@
-package org.example.mydrive.dtos;
+package org.example.mydrive.dto;
+
 public class ChatMessage {
     private String role;
     private String content;

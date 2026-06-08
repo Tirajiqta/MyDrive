@@ -262,6 +262,25 @@ export const auth = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  setLanguage: (code: string) =>
+    request<UserResponse>("/api/auth/me/language", {
+      method: "PUT",
+      body: JSON.stringify({ code }),
+    }),
+};
+
+// ─── Languages ────────────────────────────────────────────────────────────────
+
+export interface LanguageResponse {
+  id: number;
+  code: string;
+  name: string;
+  isActive: boolean;
+}
+
+export const languagesApi = {
+  list: () => request<LanguageResponse[]>("/api/languages"),
 };
 
 // ─── Files ────────────────────────────────────────────────────────────────────
@@ -272,17 +291,37 @@ export const filesApi = {
 
   get: (id: number) => request<FileResponse>(`/api/files/${id}`),
 
-  create: (data: {
-    name: string;
-    folderId: number;
-    mimeType: string;
-    sizeBytes: number;
-    storageKey: string;
-  }) =>
-    request<FileResponse>("/api/files", {
+  // Uploads the actual file bytes as multipart/form-data to the backend, which
+  // stores the blob and creates the FileEntity. Don't set Content-Type — the
+  // browser adds the multipart boundary itself.
+  upload: async (file: File, folderId: number): Promise<FileResponse> => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("parentId", String(folderId));
+
+    const token = getAccessToken();
+    const res = await loggedFetch(`${API_BASE}/api/files/upload`, {
       method: "POST",
-      body: JSON.stringify(data),
-    }),
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+    if (!res.ok) {
+      let message = `Upload failed (HTTP ${res.status})`;
+      try {
+        const text = await res.text();
+        if (text) {
+          try {
+            const json = JSON.parse(text) as { message?: string };
+            if (json.message) message = json.message;
+          } catch {
+            message = text;
+          }
+        }
+      } catch {}
+      throw new Error(message);
+    }
+    return res.json() as Promise<FileResponse>;
+  },
 
   update: (id: number, data: { name: string; parentId?: number }) =>
     request<FileResponse>(`/api/files/${id}`, {
@@ -372,6 +411,76 @@ export const chatApi = {
     if (!res.ok) throw new Error("Chat request failed");
     return res.text();
   },
+};
+
+// ─── Subscription ─────────────────────────────────────────────────────────────
+
+export interface PlanResponse {
+  id: number;
+  internalName: string;
+  storageLimitGB: number;
+  pricePerMonth: number;
+  currency: string;
+  isActive: boolean;
+}
+
+export interface UserSubscriptionResponse {
+  id: number;
+  user: UserResponse;
+  plan: PlanResponse;
+  startDate: string;
+  endDate: string | null;
+  status: string;
+  renewalDate: string | null;
+}
+
+export const subscriptionApi = {
+  plans: () => request<PlanResponse[]>("/api/subscription/plans"),
+
+  current: () => request<UserSubscriptionResponse>("/api/subscription"),
+
+  // Persists the purchased plan on the backend after Stripe confirms payment.
+  activate: (data: { plan: string; stripeSessionId?: string }) =>
+    request<UserSubscriptionResponse>("/api/subscription/activate", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+};
+
+// ─── Support & FAQ ──────────────────────────────────────────────────────────
+
+export interface SupportTicketResponse {
+  id: number;
+  subject: string;
+  description: string;
+  status: string;
+  priority: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FaqResponse {
+  id: number;
+  internalQuestionKey: string;
+  translatedQuestion: string | null;
+  translatedAnswer: string | null;
+  translatedCategory: string | null;
+  translatedKeywords: string | null;
+}
+
+export const supportApi = {
+  listTickets: () => request<SupportTicketResponse[]>("/api/support/tickets"),
+
+  createTicket: (data: { subject: string; description: string; priority?: string }) =>
+    request<SupportTicketResponse>("/api/support/tickets", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+};
+
+export const faqApi = {
+  list: (lang?: string) =>
+    request<FaqResponse[]>(lang ? `/api/faq?lang=${encodeURIComponent(lang)}` : "/api/faq"),
 };
 
 // ─── Document content (collaborative editing) ────────────────────────────────

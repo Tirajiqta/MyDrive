@@ -1,7 +1,7 @@
 package org.example.mydrive.services;
 
-import org.example.mydrive.dtos.ChatRequest;
-import org.example.mydrive.dtos.ChatResponse;
+import org.example.mydrive.dto.ChatRequest;
+import org.example.mydrive.dto.ChatResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;

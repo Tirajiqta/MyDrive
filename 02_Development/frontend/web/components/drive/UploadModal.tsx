@@ -38,13 +38,7 @@ export function UploadModal({
     if (!selectedFile || folderId == null) return;
     setLoading(true);
     try {
-      await filesApi.create({
-        name: selectedFile.name,
-        folderId,
-        mimeType: selectedFile.type || "application/octet-stream",
-        sizeBytes: selectedFile.size,
-        storageKey: `${Date.now()}-${selectedFile.name}`,
-      });
+      await filesApi.upload(selectedFile, folderId);
       toast.success(`${selectedFile.name} added`);
       setSelectedFile(null);
       onUploaded();

@@ -4,10 +4,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { auth, formatBytes } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useI18n } from "@/contexts/I18nContext";
+import { LOCALE_LABELS, type Locale } from "@/lib/i18n";
 import { Header } from "@/components/layout/Header";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { User, Lock, HardDrive } from "lucide-react";
+import { User, Lock, HardDrive, Languages } from "lucide-react";
 
 function Section({
   title,
@@ -33,6 +35,7 @@ function Section({
 
 export default function SettingsPage() {
   const { user, refreshUser } = useAuth();
+  const { t, locale, setLocale } = useI18n();
 
   const [pw, setPw] = useState({
     currentPassword: "",
@@ -40,6 +43,21 @@ export default function SettingsPage() {
     confirm: "",
   });
   const [pwLoading, setPwLoading] = useState(false);
+  const [langSaving, setLangSaving] = useState(false);
+
+  const handleLanguageChange = async (next: Locale) => {
+    setLocale(next); // instant UI update
+    setLangSaving(true);
+    try {
+      await auth.setLanguage(next);
+      await refreshUser();
+      toast.success(t("common.save"));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save language");
+    } finally {
+      setLangSaving(false);
+    }
+  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,13 +90,13 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <Header title="Settings" />
+      <Header title={t("settings.title")} />
 
       <div className="px-8 py-6 flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto flex flex-col gap-6">
           {/* Profile */}
           <Section
-            title="Profile"
+            title={t("settings.profile")}
             icon={<User className="w-4 h-4 text-indigo-600" />}
           >
             <div className="flex items-center gap-5 mb-6">
@@ -92,10 +110,12 @@ export default function SettingsPage() {
             </div>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="bg-gray-50 rounded-lg px-4 py-3">
-                <p className="text-gray-400 text-xs mb-1">Member since</p>
+                <p className="text-gray-400 text-xs mb-1">
+                  {t("settings.memberSince")}
+                </p>
                 <p className="font-medium text-gray-700">
                   {user?.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString("en-GB", {
+                    ? new Date(user.createdAt).toLocaleDateString(locale, {
                         month: "long",
                         year: "numeric",
                       })
@@ -103,25 +123,49 @@ export default function SettingsPage() {
                 </p>
               </div>
               <div className="bg-gray-50 rounded-lg px-4 py-3">
-                <p className="text-gray-400 text-xs mb-1">Language</p>
+                <p className="text-gray-400 text-xs mb-1">
+                  {t("settings.language")}
+                </p>
                 <p className="font-medium text-gray-700 uppercase">
-                  {user?.preferredLanguageCode ?? "en"}
+                  {user?.preferredLanguageCode ?? locale}
                 </p>
               </div>
             </div>
           </Section>
 
+          {/* Language */}
+          <Section
+            title={t("settings.language")}
+            icon={<Languages className="w-4 h-4 text-indigo-600" />}
+          >
+            <p className="text-sm text-gray-500 mb-3">
+              {t("settings.languageHint")}
+            </p>
+            <select
+              value={locale}
+              disabled={langSaving}
+              onChange={(e) => handleLanguageChange(e.target.value as Locale)}
+              className="w-full sm:w-64 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-60"
+            >
+              {(Object.keys(LOCALE_LABELS) as Locale[]).map((code) => (
+                <option key={code} value={code}>
+                  {LOCALE_LABELS[code]}
+                </option>
+              ))}
+            </select>
+          </Section>
+
           {/* Storage */}
           <Section
-            title="Storage"
+            title={t("settings.storage")}
             icon={<HardDrive className="w-4 h-4 text-indigo-600" />}
           >
             <div className="flex justify-between text-sm mb-2">
               <span className="text-gray-600">
-                {formatBytes(storageUsed)} used
+                {formatBytes(storageUsed)} {t("settings.used")}
               </span>
               <span className="text-gray-400">
-                of {user?.storageLimitGB} GB
+                {t("settings.of")} {user?.storageLimitGB} GB
               </span>
             </div>
             <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
@@ -137,13 +181,13 @@ export default function SettingsPage() {
               />
             </div>
             <p className="text-xs text-gray-400 mt-2">
-              {(100 - storagePct).toFixed(1)}% free
+              {(100 - storagePct).toFixed(1)}% {t("settings.free")}
             </p>
           </Section>
 
           {/* Change password */}
           <Section
-            title="Change password"
+            title={t("settings.changePassword")}
             icon={<Lock className="w-4 h-4 text-indigo-600" />}
           >
             <form
@@ -151,7 +195,7 @@ export default function SettingsPage() {
               className="flex flex-col gap-4"
             >
               <Input
-                label="Current password"
+                label={t("settings.currentPassword")}
                 type="password"
                 value={pw.currentPassword}
                 onChange={(e) =>
@@ -161,17 +205,17 @@ export default function SettingsPage() {
                 required
               />
               <Input
-                label="New password"
+                label={t("settings.newPassword")}
                 type="password"
                 value={pw.newPassword}
                 onChange={(e) =>
                   setPw((p) => ({ ...p, newPassword: e.target.value }))
                 }
-                placeholder="At least 6 characters"
+                placeholder="••••••••"
                 required
               />
               <Input
-                label="Confirm new password"
+                label={t("settings.confirmPassword")}
                 type="password"
                 value={pw.confirm}
                 onChange={(e) =>
@@ -182,7 +226,7 @@ export default function SettingsPage() {
               />
               <div className="flex justify-end">
                 <Button type="submit" loading={pwLoading}>
-                  Update password
+                  {t("settings.updatePassword")}
                 </Button>
               </div>
             </form>

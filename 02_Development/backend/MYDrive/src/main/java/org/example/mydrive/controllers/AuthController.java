@@ -64,4 +64,11 @@ public class AuthController {
         Long userId = ((Number) auth.getTokenAttributes().get("uid")).longValue();
         return authService.getUserResponseById(userId);
     }
+
+    @PutMapping("/me/language")
+    public UserResponse updateLanguage(@Valid @RequestBody UpdateLanguageRequest req,
+                                       JwtAuthenticationToken auth) {
+        Long userId = ((Number) auth.getTokenAttributes().get("uid")).longValue();
+        return authService.updatePreferredLanguage(userId, req.code());
+    }
 }

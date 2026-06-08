@@ -6,25 +6,29 @@ import {
   CloudIcon,
   CreditCard,
   FolderOpen,
+  HelpCircle,
   Link2,
   LogOut,
   Settings,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useI18n } from "@/contexts/I18nContext";
 import { StorageBar } from "@/components/drive/StorageBar";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 const navItems = [
-  { href: "/drive", icon: FolderOpen, label: "My Drive" },
-  { href: "/shares", icon: Link2, label: "Shared Links" },
-  { href: "/subscription", icon: CreditCard, label: "Subscription" },
-  { href: "/settings", icon: Settings, label: "Settings" },
+  { href: "/drive", icon: FolderOpen, labelKey: "nav.drive" },
+  { href: "/shares", icon: Link2, labelKey: "nav.shares" },
+  { href: "/subscription", icon: CreditCard, labelKey: "nav.subscription" },
+  { href: "/support", icon: HelpCircle, labelKey: "nav.support" },
+  { href: "/settings", icon: Settings, labelKey: "nav.settings" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { t } = useI18n();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -51,7 +55,7 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 py-4 overflow-y-auto">
-        {navItems.map(({ href, icon: Icon, label }) => {
+        {navItems.map(({ href, icon: Icon, labelKey }) => {
           const active =
             href === "/drive"
               ? pathname === "/drive" || pathname.startsWith("/drive/folder")
@@ -68,7 +72,7 @@ export function Sidebar() {
                 }`}
             >
               <Icon className="w-4 h-4" />
-              {label}
+              {t(labelKey)}
             </Link>
           );
         })}
@@ -93,7 +97,7 @@ export function Sidebar() {
           className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          Sign out
+          {t("nav.signOut")}
         </button>
       </div>
     </aside>

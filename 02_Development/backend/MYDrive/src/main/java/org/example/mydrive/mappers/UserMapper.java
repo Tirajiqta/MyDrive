@@ -8,6 +8,13 @@ import org.springframework.stereotype.Component;
 public class UserMapper implements GenericMapper<UserEntity, UserResponse> {
     @Override
     public UserResponse toDto(UserEntity entity) {
+        Integer storageLimitGb = (entity.getActiveSubscription() != null && entity.getActiveSubscription().getPlanEntity() != null)
+                ? entity.getActiveSubscription().getPlanEntity().getStorageLimitGB()
+                : null;
+        String langCode = entity.getPreferredLanguageEntity() != null
+                ? entity.getPreferredLanguageEntity().getCode()
+                : null;
+
         return new UserResponse(
                 entity.getId(),
                 entity.getUsername(),
@@ -15,8 +22,8 @@ public class UserMapper implements GenericMapper<UserEntity, UserResponse> {
                 entity.getCreatedAt(),
                 entity.getLastLogin(),
                 entity.getCurrentStorageUsed(),
-                entity.getActiveSubscription().getPlanEntity().getStorageLimitGB(),
-                entity.getPreferredLanguageEntity().getCode()
+                storageLimitGb,
+                langCode
         );
     }
 
