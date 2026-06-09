@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "faq_translations", uniqueConstraints = {
@@ -21,10 +23,14 @@ public class FaqTranslationEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "faq_id", nullable = false)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private FaqEntity faq;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id", nullable = false)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private LanguageEntity languageEntity;
 
     @Column(columnDefinition = "TEXT", nullable = false)
