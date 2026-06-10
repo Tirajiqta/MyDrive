@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="jwt" name="2.5 JWT Authentication">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1180" pageHeight="820" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Group frames -->
+        <mxCell id="g1" value="Вход (Login)" style="shape=umlFrame;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;fontStyle=1;align=left;verticalAlign=top;" vertex="1" parent="1"><mxGeometry x="40" y="95" width="1080" height="355" as="geometry"/></mxCell>
+        <mxCell id="g2" value="Опресняване (Refresh / rotation)" style="shape=umlFrame;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;fontStyle=1;align=left;verticalAlign=top;" vertex="1" parent="1"><mxGeometry x="40" y="455" width="1080" height="325" as="geometry"/></mxCell>
+        <!-- Lifelines -->
+        <mxCell id="ln_u" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="60" as="sourcePoint"/><mxPoint x="80" y="770" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_ac" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="60" as="sourcePoint"/><mxPoint x="280" y="770" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_as" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="60" as="sourcePoint"/><mxPoint x="480" y="770" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_am" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="60" as="sourcePoint"/><mxPoint x="680" y="770" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_js" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="880" y="60" as="sourcePoint"/><mxPoint x="880" y="770" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_db" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1080" y="60" as="sourcePoint"/><mxPoint x="1080" y="770" as="targetPoint"/></mxGeometry></mxCell>
+        <!-- Headers -->
+        <mxCell id="h_u" value="Потребител" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="20" y="20" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_ac" value="AuthController" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="210" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_as" value="AuthService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="410" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_am" value="AuthenticationManager&#10;+ BCrypt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="610" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_js" value="JwtService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="810" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_db" value="MySQL&#10;(refresh_tokens)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="1010" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <!-- Login messages -->
+        <mxCell id="j1" value="POST /api/auth/login&#10;(username/email, password)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="130" as="sourcePoint"/><mxPoint x="280" y="130" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j2" value="login(req)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="166" as="sourcePoint"/><mxPoint x="480" y="166" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j3" value="authenticate(credentials)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="202" as="sourcePoint"/><mxPoint x="680" y="202" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j4" value="Authentication OK" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="238" as="sourcePoint"/><mxPoint x="480" y="238" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j5" value="издаване на access token (JWT, HS256, 1 час)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="274" as="sourcePoint"/><mxPoint x="880" y="274" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j6" value="accessToken" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="880" y="310" as="sourcePoint"/><mxPoint x="480" y="310" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j7" value="save refresh token (SHA-256 hash, 30 дни)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="346" as="sourcePoint"/><mxPoint x="1080" y="346" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j8" value="AuthTokensResponse(access, refresh)" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="382" as="sourcePoint"/><mxPoint x="280" y="382" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j9" value="200 OK (access + refresh)" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="418" as="sourcePoint"/><mxPoint x="80" y="418" as="targetPoint"/></mxGeometry></mxCell>
+        <!-- Refresh messages -->
+        <mxCell id="j10" value="POST /api/auth/refresh (refreshToken)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="490" as="sourcePoint"/><mxPoint x="280" y="490" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j11" value="refresh(req)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="526" as="sourcePoint"/><mxPoint x="480" y="526" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j12" value="проверка на tokenHash (валиден, не е оттеглен)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="562" as="sourcePoint"/><mxPoint x="1080" y="562" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j13" value="OK -&gt; анулиране на стария токен" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1080" y="598" as="sourcePoint"/><mxPoint x="480" y="598" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j14" value="нов access token" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="634" as="sourcePoint"/><mxPoint x="880" y="634" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j15" value="нов refresh token (rotation)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="670" as="sourcePoint"/><mxPoint x="1080" y="670" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j16" value="нов AuthTokensResponse" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="706" as="sourcePoint"/><mxPoint x="280" y="706" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="j17" value="200 OK (нов чифт токени)" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="742" as="sourcePoint"/><mxPoint x="80" y="742" as="targetPoint"/></mxGeometry></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

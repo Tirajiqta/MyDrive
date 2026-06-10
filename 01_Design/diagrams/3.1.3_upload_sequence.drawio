@@ -1,0 +1,36 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="upload" name="3.1.3 File Upload">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1180" pageHeight="620" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Lifelines -->
+        <mxCell id="ln_u" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="60" as="sourcePoint"/><mxPoint x="80" y="560" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_nx" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="60" as="sourcePoint"/><mxPoint x="280" y="560" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_fc" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="60" as="sourcePoint"/><mxPoint x="480" y="560" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_fs" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="60" as="sourcePoint"/><mxPoint x="680" y="560" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_disk" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="880" y="60" as="sourcePoint"/><mxPoint x="880" y="560" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_db" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1080" y="60" as="sourcePoint"/><mxPoint x="1080" y="560" as="targetPoint"/></mxGeometry></mxCell>
+        <!-- Headers -->
+        <mxCell id="h_u" value="Потребител&#10;(Browser)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="10" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_nx" value="Next.js (proxy)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="210" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_fc" value="FileController" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="410" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_fs" value="FileService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="610" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_disk" value="Файлова система&#10;(storage)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="810" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_db" value="MySQL (files)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="1010" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <!-- Messages -->
+        <mxCell id="m1" value="POST /proxy/api/files/upload&#10;(multipart: file, parentFolderId)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="110" as="sourcePoint"/><mxPoint x="280" y="110" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="m2" value="POST /api/files/upload" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="150" as="sourcePoint"/><mxPoint x="480" y="150" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="m3" value="upload(file, parentFolderId, ownerId)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="190" as="sourcePoint"/><mxPoint x="680" y="190" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="m4" value="uniqueName = UUID + &quot;_&quot; + originalFilename" style="html=1;endArrow=block;verticalAlign=bottom;rounded=0;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="225" as="sourcePoint"/><mxPoint x="680" y="255" as="targetPoint"/><Array as="points"><mxPoint x="760" y="225"/><mxPoint x="760" y="255"/></Array></mxGeometry></mxCell>
+        <mxCell id="m5" value="Files.copy(inputStream, target)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="285" as="sourcePoint"/><mxPoint x="880" y="285" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="m6" value="OK (записан на диска)" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="880" y="320" as="sourcePoint"/><mxPoint x="680" y="320" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="m7" value="save(FileEntity)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="360" as="sourcePoint"/><mxPoint x="1080" y="360" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="m8" value="FileEntity (id, метаданни)" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1080" y="400" as="sourcePoint"/><mxPoint x="680" y="400" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="m9" value="FileResponse" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="440" as="sourcePoint"/><mxPoint x="480" y="440" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="m10" value="200 OK + FileResponse" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="480" as="sourcePoint"/><mxPoint x="280" y="480" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="m11" value="200 OK + FileResponse (JSON)" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="520" as="sourcePoint"/><mxPoint x="80" y="520" as="targetPoint"/></mxGeometry></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

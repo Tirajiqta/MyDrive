@@ -1,0 +1,141 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="mydrive-architecture" name="MyDrive-Architecture">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1080" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ===================== Layer backgrounds ===================== -->
+        <mxCell id="bg_client" parent="1" value="Client Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;verticalAlign=top;fontSize=14;fontStyle=1;dashed=1;" vertex="1">
+          <mxGeometry x="40" y="40" width="900" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="bg_front" parent="1" value="Frontend — Next.js (App Router, port 3000)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eef5ff;strokeColor=#6c8ebf;verticalAlign=top;fontSize=14;fontStyle=1;dashed=1;" vertex="1">
+          <mxGeometry x="40" y="280" width="900" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="bg_back" parent="1" value="Backend — Spring Boot &quot;MYDrive&quot; (port 8083)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fbfaf2;strokeColor=#d6b656;verticalAlign=top;fontSize=14;fontStyle=1;dashed=1;" vertex="1">
+          <mxGeometry x="40" y="540" width="900" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="bg_ext" parent="1" value="Data Stores &amp; External Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9f3fb;strokeColor=#9673a6;verticalAlign=top;fontSize=14;fontStyle=1;dashed=1;" vertex="1">
+          <mxGeometry x="980" y="280" width="480" height="760" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== Client layer ===================== -->
+        <mxCell id="c_browser" parent="1" value="Web Browser&#xa;(SPA)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="90" y="75" width="190" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="c_mobile" parent="1" value="Mobile App&#xa;(React Native)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="360" y="75" width="190" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="c_share" parent="1" value="Public Share Visitor&#xa;(unauthenticated)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="630" y="75" width="220" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== Reverse proxy ===================== -->
+        <mxCell id="nginx" parent="1" value="Nginx — reverse proxy / TLS termination" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1">
+          <mxGeometry x="290" y="180" width="400" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== Frontend components ===================== -->
+        <mxCell id="f_pages" parent="1" value="App Router Pages&#xa;login · register · drive · shares&#xa;settings · subscription · support&#xa;share/[token]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1">
+          <mxGeometry x="70" y="330" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="f_comp" parent="1" value="React Components&#xa;DriveView · ChatBot · DocumentEditor&#xa;Upload / Share / Sign / Move modals" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1">
+          <mxGeometry x="70" y="425" width="240" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="f_ctx" parent="1" value="Contexts&#xa;Auth · I18n" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1">
+          <mxGeometry x="340" y="330" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="f_api" parent="1" value="lib/api.ts&#xa;REST client&#xa;(+ STOMP/SockJS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1">
+          <mxGeometry x="340" y="405" width="150" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="f_checkout" parent="1" value="Next API Route&#xa;/api/checkout&#xa;(server-side Stripe)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1">
+          <mxGeometry x="540" y="370" width="170" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== Backend layers ===================== -->
+        <mxCell id="b_sec" parent="1" value="Spring Security (JWT)&#xa;JWT auth filter · JwtService · UserDetailsServiceImpl · SecurityConfig · refresh tokens" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1">
+          <mxGeometry x="70" y="585" width="610" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="b_ctrl" parent="1" value="Controllers (REST + WebSocket)&#xa;Auth · File · Folder · Share · PublicShare · Collaboration · Chat&#xa;DocumentContent · DocumentSigning · Faq · Language · Subscription · SupportTicket" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1">
+          <mxGeometry x="70" y="660" width="610" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="b_svc" parent="1" value="Services (business logic)&#xa;Auth · File · Folder · Share · Subscription · SupportTicket · Faq&#xa;DocumentSigning · Chat · OpenAI · Password · StorageService (Local / FileServer)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1">
+          <mxGeometry x="70" y="755" width="610" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="b_repo" parent="1" value="Spring Data JPA Repositories&#xa;User · File · Folder · SharedItem · Plan · Subscription · Faq · RefreshToken · ..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1">
+          <mxGeometry x="70" y="855" width="610" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b_ent" parent="1" value="JPA Entities / Hibernate ORM&#xa;UserEntity · FileEntity · FolderEntity · SharedItemEntity · PlanEntity · ..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1">
+          <mxGeometry x="70" y="935" width="610" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- WebSocket / scheduler side column -->
+        <mxCell id="b_ws" parent="1" value="WebSocket Broker&#xa;STOMP /ws (SockJS)&#xa;/app → /topic&#xa;real-time collab &amp; chat" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="710" y="660" width="190" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="b_sched" parent="1" value="JobScheduler&#xa;(@Scheduled cleanup)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="710" y="755" width="190" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="b_init" parent="1" value="DataInitializer&#xa;(seed plans / langs / FAQ)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="710" y="855" width="190" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== External / data ===================== -->
+        <mxCell id="e_mysql" parent="1" value="MySQL&#xa;mydrivedb (3306)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1">
+          <mxGeometry x="1080" y="330" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_go" parent="1" value="Go File Server (9000)&#xa;streaming blob storage&#xa;X-Internal-Token auth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1">
+          <mxGeometry x="1030" y="455" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="e_disk" parent="1" value="Disk&#xa;/storage" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1">
+          <mxGeometry x="1300" y="450" width="120" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="e_openai" parent="1" value="OpenAI API&#xa;(gpt-4o-mini)&#xa;support chatbot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1">
+          <mxGeometry x="1080" y="565" width="200" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="e_smtp" parent="1" value="SMTP (Gmail)&#xa;email · password reset" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1">
+          <mxGeometry x="1080" y="660" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="e_stripe" parent="1" value="Stripe&#xa;subscription payments" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1">
+          <mxGeometry x="1080" y="745" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="e_sign" parent="1" value="PAdES Signing&#xa;PKCS#12 keystore (.p12)&#xa;eIDAS demo certificate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1">
+          <mxGeometry x="1080" y="830" width="220" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== Edges ===================== -->
+        <!-- clients -> nginx -->
+        <mxCell id="ed_b_n" edge="1" parent="1" source="c_browser" target="nginx" value="HTTPS / WSS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_m_n" edge="1" parent="1" source="c_mobile" target="nginx" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_s_n" edge="1" parent="1" source="c_share" target="nginx" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- nginx routes -->
+        <mxCell id="ed_n_pages" edge="1" parent="1" source="nginx" target="f_pages" value="/ (web UI, SSR)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_n_ctrl" edge="1" parent="1" source="nginx" target="b_ctrl" value="/api · /public · /ws" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- frontend internal -->
+        <mxCell id="ed_pages_comp" edge="1" parent="1" source="f_pages" target="f_comp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;dashed=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_pages_api" edge="1" parent="1" source="f_pages" target="f_api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;dashed=1;"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- frontend -> backend -->
+        <mxCell id="ed_api_ctrl" edge="1" parent="1" source="f_api" target="b_ctrl" value="REST / JSON + JWT&#10;STOMP over WS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_checkout_stripe" edge="1" parent="1" source="f_checkout" target="e_stripe" value="Stripe API (server-side key)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- backend layer flow -->
+        <mxCell id="ed_sec_ctrl" edge="1" parent="1" source="b_sec" target="b_ctrl" value="authenticated request" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_ctrl_svc" edge="1" parent="1" source="b_ctrl" target="b_svc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_svc_repo" edge="1" parent="1" source="b_svc" target="b_repo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_repo_ent" edge="1" parent="1" source="b_repo" target="b_ent" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_ctrl_ws" edge="1" parent="1" source="b_ctrl" target="b_ws" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- backend -> external -->
+        <mxCell id="ed_ent_mysql" edge="1" parent="1" source="b_ent" target="e_mysql" value="JDBC / Hibernate" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_svc_go" edge="1" parent="1" source="b_svc" target="e_go" value="HTTP (PUT/GET/DELETE)&#10;upload / download" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_go_disk" edge="1" parent="1" source="e_go" target="e_disk" value="fs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_svc_openai" edge="1" parent="1" source="b_svc" target="e_openai" value="HTTPS REST" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_svc_smtp" edge="1" parent="1" source="b_svc" target="e_smtp" value="SMTP (587/STARTTLS)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ed_svc_sign" edge="1" parent="1" source="b_svc" target="e_sign" value="PAdES sign" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

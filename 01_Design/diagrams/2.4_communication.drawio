@@ -1,0 +1,43 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="comm" name="2.4 Communication">
+    <mxGraphModel dx="891" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c_browser" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Браузър" vertex="1">
+          <mxGeometry height="50" width="120" x="250" y="-10" as="geometry" />
+        </mxCell>
+        <mxCell id="c_next" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Next.js (proxy)" vertex="1">
+          <mxGeometry height="50" width="150" x="235" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="c_api" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Spring Boot API" vertex="1">
+          <mxGeometry height="50" width="160" x="235" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="c_mysql" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#f8cecc;strokeColor=#b85450;" value="MySQL" vertex="1">
+          <mxGeometry height="60" width="110" x="240" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="c_go" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Go File Server" vertex="1">
+          <mxGeometry height="50" width="120" x="700" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c_openai" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="OpenAI API" vertex="1">
+          <mxGeometry height="50" width="120" x="470" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="c_e1" edge="1" parent="1" source="c_browser" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" target="c_next" value="HTTPS (HTML/JS)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c_e2" edge="1" parent="1" source="c_next" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" target="c_api" value="REST/JSON&#xa;/proxy/*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c_e4" edge="1" parent="1" source="c_api" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" target="c_mysql" value="JDBC (Hibernate)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c_e5" edge="1" parent="1" source="c_api" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" target="c_go" value="HTTP multipart">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c_e6" edge="1" parent="1" source="c_api" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" target="c_openai" value="HTTPS REST&#xa;(gpt-4o-mini)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

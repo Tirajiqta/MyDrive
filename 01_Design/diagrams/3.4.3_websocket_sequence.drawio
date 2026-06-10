@@ -1,0 +1,36 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="websocket" name="3.4.3 WebSocket Collaboration">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="980" pageHeight="580" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Lifelines -->
+        <mxCell id="ln_a" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="60" as="sourcePoint"/><mxPoint x="80" y="510" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_b" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="60" as="sourcePoint"/><mxPoint x="280" y="510" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_ws" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="60" as="sourcePoint"/><mxPoint x="480" y="510" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_cc" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="60" as="sourcePoint"/><mxPoint x="680" y="510" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_db" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="880" y="60" as="sourcePoint"/><mxPoint x="880" y="510" as="targetPoint"/></mxGeometry></mxCell>
+        <!-- Headers -->
+        <mxCell id="h_a" value="Редактор A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="20" y="20" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_b" value="Редактор B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="220" y="20" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_ws" value="STOMP Broker&#10;(Spring)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="410" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_cc" value="Collaboration&#10;Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="610" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_db" value="MySQL&#10;(document_contents)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="810" y="20" width="140" height="40" as="geometry"/></mxCell>
+        <!-- Messages -->
+        <mxCell id="w1" value="CONNECT /ws (SockJS)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="110" as="sourcePoint"/><mxPoint x="480" y="110" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="w2" value="CONNECT /ws (SockJS)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="146" as="sourcePoint"/><mxPoint x="480" y="146" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="w3" value="SUBSCRIBE /topic/document/{fileId}" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="182" as="sourcePoint"/><mxPoint x="480" y="182" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="w4" value="SUBSCRIBE /topic/document/{fileId}" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="280" y="218" as="sourcePoint"/><mxPoint x="480" y="218" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="w5" value="SEND /app/document/{fileId}/edit&#10;(DocumentEditMessage)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="296" as="sourcePoint"/><mxPoint x="680" y="296" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="w6" value="save(DocumentContentEntity — snapshot)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="332" as="sourcePoint"/><mxPoint x="880" y="332" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="w7" value="OK" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="880" y="368" as="sourcePoint"/><mxPoint x="680" y="368" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="w8" value="@SendTo /topic/document/{fileId}" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="680" y="404" as="sourcePoint"/><mxPoint x="480" y="404" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="w9" value="broadcast DocumentEditMessage" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="440" as="sourcePoint"/><mxPoint x="80" y="440" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="w10" value="broadcast DocumentEditMessage" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="480" y="476" as="sourcePoint"/><mxPoint x="280" y="476" as="targetPoint"/></mxGeometry></mxCell>
+        <!-- Notes (top) -->
+        <mxCell id="wn1" value="Потребител A въвежда текст" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=center;size=12;" vertex="1" parent="1"><mxGeometry x="20" y="240" width="320" height="30" as="geometry"/></mxCell>
+        <mxCell id="wn2" value="UI се обновява в реално време&#10;(показва последния редактор)" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=center;size=12;" vertex="1" parent="1"><mxGeometry x="180" y="484" width="240" height="40" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

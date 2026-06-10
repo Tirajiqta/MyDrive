@@ -1,0 +1,50 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="sharing" name="3.1.5 Sharing Token Flow">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1260" pageHeight="840" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Group frames (bottom layer) -->
+        <mxCell id="g1" value="Създаване на споделяне" style="shape=umlFrame;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;fontStyle=1;align=left;verticalAlign=top;" vertex="1" parent="1"><mxGeometry x="40" y="90" width="800" height="420" as="geometry"/></mxCell>
+        <mxCell id="g2" value="Достъп до споделена връзка" style="shape=umlFrame;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;fontStyle=1;align=left;verticalAlign=top;" vertex="1" parent="1"><mxGeometry x="410" y="535" width="790" height="270" as="geometry"/></mxCell>
+        <!-- Lifelines -->
+        <mxCell id="ln_o" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="60" as="sourcePoint"/><mxPoint x="80" y="800" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_sc" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="260" y="60" as="sourcePoint"/><mxPoint x="260" y="800" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_ss" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="440" y="60" as="sourcePoint"/><mxPoint x="440" y="800" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_tu" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="620" y="60" as="sourcePoint"/><mxPoint x="620" y="800" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_db" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="800" y="60" as="sourcePoint"/><mxPoint x="800" y="800" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_r" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="980" y="60" as="sourcePoint"/><mxPoint x="980" y="800" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="ln_pc" style="endArrow=none;html=1;dashed=1;strokeColor=#999999;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1160" y="60" as="sourcePoint"/><mxPoint x="1160" y="800" as="targetPoint"/></mxGeometry></mxCell>
+        <!-- Headers -->
+        <mxCell id="h_o" value="Собственик" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="20" y="20" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_sc" value="ShareController" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="195" y="20" width="130" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_ss" value="ShareService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="375" y="20" width="130" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_tu" value="TokenUtil" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="555" y="20" width="130" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_db" value="MySQL&#10;(shared_items)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="735" y="20" width="130" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_r" value="Получател" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="920" y="20" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="h_pc" value="PublicShare&#10;Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="1095" y="20" width="130" height="40" as="geometry"/></mxCell>
+        <!-- Messages: group 1 -->
+        <mxCell id="s1" value="POST /api/shares&#10;(itemId, itemType, permission, expiresAt)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="80" y="130" as="sourcePoint"/><mxPoint x="260" y="130" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s2" value="create(req, owner)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="260" y="166" as="sourcePoint"/><mxPoint x="440" y="166" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s3" value="newOpaqueToken()  // 32 random bytes" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="440" y="202" as="sourcePoint"/><mxPoint x="620" y="202" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s4" value="rawToken" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="620" y="238" as="sourcePoint"/><mxPoint x="440" y="238" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s5" value="sha256Hex(rawToken)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="440" y="274" as="sourcePoint"/><mxPoint x="620" y="274" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s6" value="tokenHash" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="620" y="310" as="sourcePoint"/><mxPoint x="440" y="310" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s7" value="save(SharedItem{ tokenHash, ... })" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="440" y="346" as="sourcePoint"/><mxPoint x="800" y="346" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s8" value="saved" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="800" y="418" as="sourcePoint"/><mxPoint x="440" y="418" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s9" value="ShareCreateResponse(rawToken)" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="440" y="454" as="sourcePoint"/><mxPoint x="260" y="454" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s10" value="200 OK + rawToken (показва се еднократно)" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="260" y="490" as="sourcePoint"/><mxPoint x="80" y="490" as="targetPoint"/></mxGeometry></mxCell>
+        <!-- Messages: group 2 -->
+        <mxCell id="s11" value="GET /public/shares/{rawToken}" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="980" y="575" as="sourcePoint"/><mxPoint x="1160" y="575" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s12" value="sha256Hex(rawToken) -&gt; tokenHash" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1160" y="611" as="sourcePoint"/><mxPoint x="440" y="611" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s13" value="findByTokenHash(tokenHash)" style="html=1;endArrow=block;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="440" y="647" as="sourcePoint"/><mxPoint x="800" y="647" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s14" value="SharedItem" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="800" y="683" as="sourcePoint"/><mxPoint x="440" y="683" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s15" value="проверка: revokedAt == null&#10;и expiresAt не е изтекъл" style="html=1;endArrow=block;verticalAlign=bottom;rounded=0;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="440" y="705" as="sourcePoint"/><mxPoint x="440" y="733" as="targetPoint"/><Array as="points"><mxPoint x="520" y="705"/><mxPoint x="520" y="733"/></Array></mxGeometry></mxCell>
+        <mxCell id="s16" value="ShareInfoResponse" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="440" y="755" as="sourcePoint"/><mxPoint x="1160" y="755" as="targetPoint"/></mxGeometry></mxCell>
+        <mxCell id="s17" value="200 OK (тип, ниво на достъп, изтичане)" style="html=1;endArrow=open;dashed=1;verticalAlign=bottom;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1160" y="791" as="sourcePoint"/><mxPoint x="980" y="791" as="targetPoint"/></mxGeometry></mxCell>
+        <!-- Note (top layer) -->
+        <mxCell id="note1" value="Пази се само SHA-256 хешът —&#10;raw токенът никога не се записва" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=center;size=14;" vertex="1" parent="1"><mxGeometry x="690" y="358" width="230" height="46" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

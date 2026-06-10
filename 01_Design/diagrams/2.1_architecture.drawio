@@ -1,0 +1,49 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="arch" name="2.1 Architecture">
+    <mxGraphModel dx="891" dy="453" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="p1_browser" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Браузър (клиент)" vertex="1">
+          <mxGeometry height="40" width="180" x="260" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_nginx" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Nginx" vertex="1">
+          <mxGeometry height="50" width="220" x="240" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_next" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Next.js Frontend&#xa;(3000)" vertex="1">
+          <mxGeometry height="50" width="180" x="260" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_api" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Spring Boot API&#xa;MYDrive (8083)" vertex="1">
+          <mxGeometry height="50" width="180" x="260" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_go" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Go File Server&#xa;(8080)" vertex="1">
+          <mxGeometry height="50" width="170" x="490" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_mysql" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#f8cecc;strokeColor=#b85450;" value="MySQL&#xa;(3306)" vertex="1">
+          <mxGeometry height="70" width="160" x="270" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_openai" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="OpenAI API&#xa;(gpt-4o-mini)" vertex="1">
+          <mxGeometry height="50" width="170" x="500" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e1" edge="1" parent="1" source="p1_browser" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="p1_nginx" value="HTTPS / WSS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e2" edge="1" parent="1" source="p1_nginx" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="p1_next" value="/ (web UI)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e4" edge="1" parent="1" source="p1_next" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" target="p1_api" value="/proxy/* (REST/JSON)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e5" edge="1" parent="1" source="p1_api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="p1_mysql" value="JDBC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e6" edge="1" parent="1" source="p1_api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" target="p1_go" value="HTTP (upload/download)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_e7" edge="1" parent="1" source="p1_api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;exitX=1;exitY=1;exitDx=0;exitDy=0;" target="p1_openai" value="HTTPS REST">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

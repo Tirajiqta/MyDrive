@@ -1,0 +1,21 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="chatbot" name="3.6 AI Chatbot">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="b_user" value="Потребител" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="20" y="80" width="120" height="50" as="geometry"/></mxCell>
+        <mxCell id="b_widget" value="ChatBot.tsx&#10;(плаваща widget)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="180" y="80" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="b_ctrl" value="ChatController&#10;POST /api/chat (text/plain)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="380" y="80" width="200" height="50" as="geometry"/></mxCell>
+        <mxCell id="b_svc" value="OpenAIService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="630" y="80" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="b_openai" value="OpenAI Chat Completions&#10;(gpt-4o-mini)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="615" y="200" width="190" height="60" as="geometry"/></mxCell>
+        <mxCell id="b_e1" value="въпрос" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="b_user" target="b_widget"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b_e2" value="POST /api/chat" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="b_widget" target="b_ctrl"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b_e3" value="delegate" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="b_ctrl" target="b_svc"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b_e4" value="HTTPS Chat Completions" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="b_svc" target="b_openai"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b_e5" value="отговор (plain text)" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;dashed=1;exitX=0;exitY=0.5;entryX=0.5;entryY=1;" edge="1" parent="1" source="b_openai" target="b_widget"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b_e6" value="показва отговора" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;dashed=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" parent="1" source="b_widget" target="b_user"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

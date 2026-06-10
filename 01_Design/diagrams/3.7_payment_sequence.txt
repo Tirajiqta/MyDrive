@@ -1,0 +1,71 @@
+--------------------------------------------------------------------------------
+ 3.7  Платежна интеграция и абонаменти (Stripe Checkout)
+ sequencediagram.org  —  поставете блока между --- BEGIN --- и --- END ---
+--------------------------------------------------------------------------------
+--- BEGIN ---
+title 3.7 Плащане и активиране на абонамент (Stripe Checkout)
+
+actor "Потребител (Browser)\n/subscription" as U
+participant "Next.js API route\n/api/checkout(/session)" as NX
+participant "Stripe\n(Checkout + API)" as ST
+participant "SubscriptionController\n(Spring Boot :8083)" as API
+participant "SubscriptionService" as SVC
+database "MySQL\n(user_subscriptions)" as DB
+
+group Започване на Checkout сесия
+U->NX: клик "Subscribe" -> POST /api/checkout { plan }
+activate NX
+NX->NX: проверка: Stripe конфигуриран,\nвалиден план (PLANS)
+NX->ST: checkout.sessions.create(mode=subscription,\nprice_data, success_url, cancel_url, metadata.plan)
+activate ST
+ST-->NX: Session { id, url }
+deactivate ST
+NX-->U: { url }
+deactivate NX
+U->ST: window.location.href = url\n(редирект към хостваната страница на Stripe)
+end
+
+group Плащане в хостваната страница на Stripe
+activate ST
+U->ST: въвежда картови данни\n(тест: 4242 4242 4242 4242)
+ST->ST: обработва плащането
+ST-->U: редирект -> /subscription?status=success&session_id={ID}\n(или status=canceled)
+deactivate ST
+end
+
+note over U: При отказ (status=canceled):\nизвестие "no charge", без транзакция,\nабонаментът остава непроменен
+
+group Потвърждение и активиране на абонамента
+U->NX: GET /api/checkout/session?session_id=...
+activate NX
+NX->ST: checkout.sessions.retrieve(sessionId)
+activate ST
+ST-->NX: Session { status, payment_status,\nmetadata.plan, customer_email, amount }
+deactivate ST
+NX-->U: { status:'complete', plan, customerEmail, amountTotal }
+deactivate NX
+
+note over U,API: Извиква се само ако status == 'complete'
+U->API: POST /api/subscription/activate\n{ plan, stripeSessionId }  + Bearer JWT
+activate API
+API->SVC: activatePlan(userId, plan, sessionId)
+activate SVC
+SVC->DB: find user + plan (alias pro -> PRO_PLAN)
+DB-->SVC: UserEntity, PlanEntity
+SVC->SVC: reuse/create UserSubscription:\nstatus=ACTIVE, renewalDate=+1 месец,\npaymentMethodId = sessionId
+SVC->DB: save(subscription) + save(user.activeSubscription)
+DB-->SVC: saved
+SVC-->API: UserSubscriptionResponse
+deactivate SVC
+API-->U: 200 OK (планът е активиран)
+deactivate API
+
+U->API: GET /api/auth/me (refreshUser) + Bearer JWT
+activate API
+API-->U: обновен потребител (нов лимит за съхранение)
+deactivate API
+note over U: Показва се екран за успех
+end
+
+note over NX,ST: Без Stripe webhook — активирането се задейства от браузъра\nслед потвърждаване на сесията. Цената се изгражда динамично (price_data).
+--- END ---
