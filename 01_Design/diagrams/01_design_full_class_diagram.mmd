@@ -1,0 +1,596 @@
+classDiagram
+direction LR
+
+%% MyDrive class diagram
+%% Excludes DTOs, utils, mappers, config classes, and Spring/bootstrap helpers.
+
+class AuthController {
+  -AuthService authService
+  -PasswordService passwordService
+  +register(UserRegisterRequest req) AuthTokensResponse
+  +login(UserLoginRequest req) AuthTokensResponse
+  +refresh(RefreshRequest req) AuthTokensResponse
+  +logout(LogoutRequest req) void
+  +forgotPassword(ForgotPasswordRequest req) void
+  +resetPassword(ResetPasswordRequest req) void
+  +changePassword(ChangePasswordRequest req, JwtAuthenticationToken auth) void
+  +me(JwtAuthenticationToken auth) UserResponse
+  +updateLanguage(UpdateLanguageRequest req, JwtAuthenticationToken auth) UserResponse
+}
+
+class AuthService {
+  -AuthenticationManager authenticationManager
+  -UserRepository userRepository
+  -UserSubscriptionRepository userSubscriptionRepository
+  -PlanRepository planRepository
+  -LanguageRepository languageRepository
+  -RefreshTokenRepository refreshTokenRepository
+  -PasswordEncoder passwordEncoder
+  -JwtService jwtService
+  -long refreshTtlSeconds
+  +login(UserLoginRequest request) AuthTokensResponse
+  +refresh(RefreshRequest request) AuthTokensResponse
+  +logout(LogoutRequest request) void
+  +register(UserRegisterRequest request) AuthTokensResponse
+  +getUserResponseById(Long id) UserResponse
+  +updatePreferredLanguage(Long userId, String code) UserResponse
+}
+
+class PasswordService {
+  -UserRepository userRepository
+  -PasswordResetTokenRepository passwordResetTokenRepository
+  -PasswordEncoder passwordEncoder
+  -JavaMailSender mailSender
+  -long resetTtlSeconds
+  +forgotPassword(ForgotPasswordRequest req) void
+  +resetPassword(ResetPasswordRequest req) void
+  +changePassword(ChangePasswordRequest req, JwtAuthenticationToken auth) void
+}
+
+class JwtService {
+  -String secret
+  -long expirationMs
+  +generateToken(Long userId, String email) String
+}
+
+class UserDetailsServiceImpl {
+  -UserRepository userRepository
+  +loadUserByUsername(String usernameOrEmail) UserDetails
+}
+
+class SubscriptionController {
+  -SubscriptionService subscriptionService
+  +plans() List~PlanResponse~
+  +current() UserSubscriptionResponse
+  +activate(ActivateSubscriptionRequest req) UserSubscriptionResponse
+}
+
+class SubscriptionService {
+  -PlanRepository planRepository
+  -UserRepository userRepository
+  -UserSubscriptionRepository userSubscriptionRepository
+  +listActivePlans() List~PlanResponse~
+  +getCurrentSubscription(Long userId) UserSubscriptionResponse
+  +activatePlan(Long userId, String planRef, String stripeSessionId) UserSubscriptionResponse
+}
+
+class FileController {
+  -FileService fileService
+  +getById(Long id) FileResponse
+  +listByFolder(Long folderId) List~FileResponse~
+  +create(FileCreateRequest req) FileResponse
+  +update(Long id, FileUpdateRequest req) FileResponse
+  +move(Long id, MoveFileRequest req) FileResponse
+  +delete(Long id) void
+  +upload(MultipartFile file, Long parentId) FileResponse
+  +download(Long id) ResponseEntity~Resource~
+}
+
+class FileService {
+  -FileRepository fileRepository
+  -FolderRepository folderRepository
+  -UserRepository userRepository
+  -StorageService storageService
+  +getById(Long id) FileResponse
+  +listByFolder(Long folderId) List~FileResponse~
+  +upload(MultipartFile file, Long parentFolderId, Long ownerId) FileResponse
+  +getDownloadResource(Long id) DownloadResult
+  +create(FileCreateRequest req) FileResponse
+  +update(Long id, FileUpdateRequest req) FileResponse
+  +move(Long id, Long targetFolderId) FileResponse
+  +delete(Long id) void
+}
+
+class FolderController {
+  -FolderService folderService
+  +create(FolderCreateRequest req) FolderResponse
+  +list(Long parentId) List~FolderResponse~
+  +update(Long id, FolderUpdateRequest req) FolderResponse
+  +delete(Long id) void
+}
+
+class FolderService {
+  -FolderRepository folderRepository
+  -UserRepository userRepository
+  +create(Long userId, FolderCreateRequest req) FolderResponse
+  +list(Long userId, Long parentId) List~FolderResponse~
+  +update(Long userId, Long folderId, FolderUpdateRequest req) FolderResponse
+  +delete(Long userId, Long folderId) void
+}
+
+class ShareController {
+  -ShareService shareService
+  +create(ShareCreateRequest req) ShareCreateResponse
+  +listMine() List~ShareListItemResponse~
+  +revoke(Long id) void
+}
+
+class PublicShareController {
+  -ShareService shareService
+  +resolve(String token) ShareInfoResponse
+}
+
+class ShareService {
+  -SharedItemRepository sharedItemRepository
+  -UserRepository userRepository
+  +create(Long ownerId, ShareCreateRequest req) ShareCreateResponse
+  +resolvePublic(String rawToken) ShareInfoResponse
+  +listMine(Long ownerId) List~ShareListItemResponse~
+  +revoke(Long ownerId, Long shareId) void
+}
+
+class DocumentSigningController {
+  -DocumentSigningService signingService
+  +signFile(Long fileId) SignatureResponse
+  +getSignatures(Long fileId) List~SignatureResponse~
+  +downloadSigned(Long signatureId) ResponseEntity~PathResource~
+}
+
+class DocumentSigningService {
+  -DocumentSignatureRepository signatureRepository
+  -FileRepository fileRepository
+  -UserRepository userRepository
+  +initKeystore() void
+  +signPdf(Long fileId, Long userId) SignatureResponse
+  +getSignatures(Long fileId) List~SignatureResponse~
+  +getSignedFilePath(Long signatureId) Path
+}
+
+class DocumentContentController {
+  -DocumentContentRepository contentRepository
+  +getContent(Long fileId) DocumentContentResponse
+}
+
+class CollaborationController {
+  -DocumentContentRepository contentRepository
+  +broadcastEdit(Long fileId, DocumentEditMessage message) DocumentEditMessage
+}
+
+class FaqController {
+  -FaqService faqService
+  +list(String lang) List~FaqResponse~
+  +create(FaqCreateRequest req) FaqResponse
+}
+
+class FaqService {
+  -FaqRepository faqRepository
+  -LanguageRepository languageRepository
+  +list(String langCode) List~FaqResponse~
+  +create(FaqCreateRequest req) FaqResponse
+}
+
+class LanguageController {
+  -LanguageRepository languageRepository
+  +list() List~LanguageResponse~
+}
+
+class SupportTicketController {
+  -SupportTicketService supportTicketService
+  +create(SupportTicketCreateRequest req) SupportTicketResponse
+  +list() List~SupportTicketResponse~
+  +get(Long id) SupportTicketResponse
+}
+
+class SupportTicketService {
+  -SupportTicketRepository ticketRepository
+  -UserRepository userRepository
+  +create(Long userId, SupportTicketCreateRequest req) SupportTicketResponse
+  +listForUser(Long userId) List~SupportTicketResponse~
+  +get(Long userId, Long ticketId) SupportTicketResponse
+}
+
+class ChatController {
+  -ChatService chatService
+  +chat(String userMessage) Mono~String~
+}
+
+class ChatService {
+  -OpenAIService openAIService
+  -ChatbotInteractionRepository interactionRepository
+  -UserRepository userRepository
+  +chat(Long userId, String userMessage, ChatRequest request) Mono~String~
+}
+
+class OpenAIService {
+  -WebClient webClient
+  +sendMessage(ChatRequest request) Mono~ChatResponse~
+}
+
+class StorageService {
+  <<interface>>
+  +store(String key, InputStream content, long size) void
+  +load(String key) Resource
+  +delete(String key) void
+}
+
+class LocalStorageService {
+  -Path rootLocation
+  +init() void
+  +store(String key, InputStream content, long size) void
+  +load(String key) Resource
+  +delete(String key) void
+}
+
+class FileServerStorageService {
+  -RestClient restClient
+  +store(String key, InputStream content, long size) void
+  +load(String key) Resource
+  +delete(String key) void
+}
+
+class UserEntity {
+  -Long id
+  -String username
+  -String password
+  -String email
+  -LocalDateTime createdAt
+  -LocalDateTime lastLogin
+  -Long currentStorageUsed
+  -LanguageEntity preferredLanguageEntity
+  -UserSubscriptionEntity activeSubscription
+}
+
+class UserSubscriptionEntity {
+  -Long id
+  -UserEntity user
+  -PlanEntity planEntity
+  -LocalDateTime startDate
+  -LocalDateTime endDate
+  -String status
+  -LocalDateTime renewalDate
+  -String paymentMethodId
+  -LocalDateTime createdAt
+  -LocalDateTime updatedAt
+}
+
+class PlanEntity {
+  -Long id
+  -String internalName
+  -PlanType type
+  -Integer storageLimitGB
+  -BigDecimal pricePerMonth
+  -String currency
+  -Boolean isActive
+  -LocalDateTime createdAt
+  -LocalDateTime updatedAt
+}
+
+class PlanTranslationEntity {
+  -Long id
+  -PlanEntity planEntity
+  -LanguageEntity languageEntity
+  -String name
+  -String description
+}
+
+class RefreshTokenEntity {
+  -Long id
+  -UserEntity user
+  -String tokenHash
+  -Instant expiresAt
+  -Instant revokedAt
+  -Instant createdAt
+}
+
+class PasswordResetTokenEntity {
+  -Long id
+  -UserEntity user
+  -String tokenHash
+  -Instant expiresAt
+  -Instant usedAt
+  -Instant createdAt
+}
+
+class FileEntity {
+  -Long id
+  -String originalFileName
+  -String uniqueName
+  -String type
+  -Long size
+  -LocalDateTime uploadDate
+  -LocalDateTime lastModifiedDate
+  -UserEntity owner
+  -FolderEntity parent
+  -Boolean isDeleted
+}
+
+class FolderEntity {
+  -Long id
+  -String canonicalName
+  -LocalDateTime creationDate
+  -LocalDateTime lastModifiedDate
+  -UserEntity owner
+  -FolderEntity parent
+  -Boolean isDeleted
+  -Set~FolderEntity~ childrenFolderEntities
+  -Set~FileEntity~ fileEntities
+}
+
+class SharedItemEntity {
+  -Long id
+  -Long itemId
+  -ItemType itemType
+  -UserEntity owner
+  -UserEntity sharedWithUser
+  -PermissionLevel permissionLevel
+  -LocalDateTime sharedDate
+  -String tokenHash
+  -LocalDateTime expiresAt
+  -LocalDateTime revokedAt
+}
+
+class DocumentSignatureEntity {
+  -Long id
+  -Long fileId
+  -UserEntity signedBy
+  -LocalDateTime signedAt
+  -String signerName
+  -String certificateSubject
+  -String certificateIssuer
+  -LocalDateTime certificateValidFrom
+  -LocalDateTime certificateValidTo
+  -String signatureLevel
+  -String signedUniqueName
+}
+
+class DocumentContentEntity {
+  -Long fileId
+  -String content
+  -LocalDateTime lastUpdated
+  -String lastEditorUsername
+}
+
+class FaqEntity {
+  -Long id
+  -String internalQuestionKey
+  -LocalDateTime createdAt
+  -LocalDateTime updatedAt
+  -Set~FaqTranslationEntity~ translations
+}
+
+class FaqTranslationEntity {
+  -Long id
+  -FaqEntity faq
+  -LanguageEntity languageEntity
+  -String question
+  -String answer
+  -String category
+  -String keywords
+}
+
+class LanguageEntity {
+  -Long id
+  -String code
+  -String name
+  -Boolean isActive
+}
+
+class SupportTicketEntity {
+  -Long id
+  -UserEntity user
+  -String subject
+  -String description
+  -String status
+  -String priority
+  -UserEntity assignedAgent
+  -LocalDateTime createdAt
+  -LocalDateTime updatedAt
+  -String githubIssueUrl
+  -Long githubIssueId
+}
+
+class ChatbotInteractionEntity {
+  -Long id
+  -SupportTicketEntity ticket
+  -UserEntity user
+  -String message
+  -String response
+  -LocalDateTime timestamp
+  -Boolean isUserMessage
+}
+
+class UserRepository {
+  <<interface>>
+  +findByEmail(String email) Optional~UserEntity~
+  +findByUsername(String username) Optional~UserEntity~
+  +existsByEmail(String email) boolean
+  +existsByUsername(String username) boolean
+}
+
+class UserSubscriptionRepository {
+  <<interface>>
+  +findByPlanEntity_Id(Long planId) Optional~UserSubscriptionEntity~
+  +existsByUserId(Long userId) boolean
+}
+
+class PlanRepository {
+  <<interface>>
+  +findByType(PlanType type) Optional~PlanEntity~
+  +findByInternalNameAndIsActiveTrue(String internalName) Optional~PlanEntity~
+  +findFirstByTypeAndIsActiveTrue(PlanType type) Optional~PlanEntity~
+}
+
+class PlanTranslationRepository {
+  <<interface>>
+}
+
+class LanguageRepository {
+  <<interface>>
+  +findByCode(String code) Optional~LanguageEntity~
+}
+
+class RefreshTokenRepository {
+  <<interface>>
+  +findByTokenHash(String tokenHash) Optional~RefreshTokenEntity~
+  +deleteByExpiresAtBefore(Instant now) long
+}
+
+class PasswordResetTokenRepository {
+  <<interface>>
+  +findByTokenHash(String tokenHash) Optional~PasswordResetTokenEntity~
+  +deleteByExpiresAtBefore(Instant now) long
+}
+
+class FileRepository {
+  <<interface>>
+  +findAllByParentId(Long folderId) List~FileEntity~
+}
+
+class FolderRepository {
+  <<interface>>
+  +findByIdAndOwnerIdAndIsDeletedFalse(Long id, Long ownerId) Optional~FolderEntity~
+  +findAllByOwnerIdAndParentIsNullAndIsDeletedFalse(Long ownerId) List~FolderEntity~
+  +findAllByOwnerIdAndParentIdAndIsDeletedFalse(Long ownerId, Long parentId) List~FolderEntity~
+  +existsByOwnerIdAndParentIsNullAndCanonicalNameIgnoreCaseAndIsDeletedFalse(Long ownerId, String name) boolean
+  +existsByOwnerIdAndParentIdAndCanonicalNameIgnoreCaseAndIsDeletedFalse(Long ownerId, Long parentId, String name) boolean
+}
+
+class SharedItemRepository {
+  <<interface>>
+  +findByTokenHash(String tokenHash) Optional~SharedItemEntity~
+  +findAllByOwnerId(Long ownerId) List~SharedItemEntity~
+}
+
+class DocumentSignatureRepository {
+  <<interface>>
+  +findAllByFileId(Long fileId) List~DocumentSignatureEntity~
+}
+
+class DocumentContentRepository {
+  <<interface>>
+}
+
+class FaqRepository {
+  <<interface>>
+  +findByInternalQuestionKey(String internalQuestionKey) Optional~FaqEntity~
+}
+
+class FaqTranslationRepository {
+  <<interface>>
+  +findByFaq_IdAndLanguageEntity_Code(Long faqId, String code) Optional~FaqTranslationEntity~
+}
+
+class SupportTicketRepository {
+  <<interface>>
+  +findByUser_IdOrderByCreatedAtDesc(Long userId) List~SupportTicketEntity~
+}
+
+class ChatbotInteractionRepository {
+  <<interface>>
+}
+
+AuthController --> AuthService
+AuthController --> PasswordService
+AuthService --> UserRepository
+AuthService --> UserSubscriptionRepository
+AuthService --> PlanRepository
+AuthService --> LanguageRepository
+AuthService --> RefreshTokenRepository
+AuthService --> JwtService
+PasswordService --> UserRepository
+PasswordService --> PasswordResetTokenRepository
+UserDetailsServiceImpl --> UserRepository
+
+SubscriptionController --> SubscriptionService
+SubscriptionService --> PlanRepository
+SubscriptionService --> UserRepository
+SubscriptionService --> UserSubscriptionRepository
+
+FileController --> FileService
+FileService --> FileRepository
+FileService --> FolderRepository
+FileService --> UserRepository
+FileService --> StorageService
+LocalStorageService ..|> StorageService
+FileServerStorageService ..|> StorageService
+
+FolderController --> FolderService
+FolderService --> FolderRepository
+FolderService --> UserRepository
+
+ShareController --> ShareService
+PublicShareController --> ShareService
+ShareService --> SharedItemRepository
+ShareService --> UserRepository
+
+DocumentSigningController --> DocumentSigningService
+DocumentSigningService --> DocumentSignatureRepository
+DocumentSigningService --> FileRepository
+DocumentSigningService --> UserRepository
+DocumentContentController --> DocumentContentRepository
+CollaborationController --> DocumentContentRepository
+
+FaqController --> FaqService
+FaqService --> FaqRepository
+FaqService --> LanguageRepository
+LanguageController --> LanguageRepository
+
+SupportTicketController --> SupportTicketService
+SupportTicketService --> SupportTicketRepository
+SupportTicketService --> UserRepository
+
+ChatController --> ChatService
+ChatService --> OpenAIService
+ChatService --> ChatbotInteractionRepository
+ChatService --> UserRepository
+
+UserRepository ..> UserEntity
+UserSubscriptionRepository ..> UserSubscriptionEntity
+PlanRepository ..> PlanEntity
+PlanTranslationRepository ..> PlanTranslationEntity
+LanguageRepository ..> LanguageEntity
+RefreshTokenRepository ..> RefreshTokenEntity
+PasswordResetTokenRepository ..> PasswordResetTokenEntity
+FileRepository ..> FileEntity
+FolderRepository ..> FolderEntity
+SharedItemRepository ..> SharedItemEntity
+DocumentSignatureRepository ..> DocumentSignatureEntity
+DocumentContentRepository ..> DocumentContentEntity
+FaqRepository ..> FaqEntity
+FaqTranslationRepository ..> FaqTranslationEntity
+SupportTicketRepository ..> SupportTicketEntity
+ChatbotInteractionRepository ..> ChatbotInteractionEntity
+
+UserEntity "1" --> "0..1" UserSubscriptionEntity : activeSubscription
+UserEntity "1" --> "0..*" RefreshTokenEntity : refreshTokens
+UserEntity "1" --> "0..*" PasswordResetTokenEntity : resetTokens
+UserEntity "1" --> "0..*" FileEntity : owns
+UserEntity "1" --> "0..*" FolderEntity : owns
+UserEntity "1" --> "0..*" SharedItemEntity : owns
+UserEntity "0..1" --> "0..*" SharedItemEntity : sharedWith
+UserEntity "1" --> "0..*" SupportTicketEntity : tickets
+UserEntity "1" --> "0..*" ChatbotInteractionEntity : chats
+UserEntity "1" --> "0..*" DocumentSignatureEntity : signs
+UserEntity "0..*" --> "1" LanguageEntity : preferredLanguage
+
+UserSubscriptionEntity "0..*" --> "1" PlanEntity : plan
+PlanEntity "1" --> "0..*" PlanTranslationEntity : translations
+PlanTranslationEntity "0..*" --> "1" LanguageEntity : language
+
+FolderEntity "0..1" --> "0..*" FolderEntity : children
+FolderEntity "0..1" --> "0..*" FileEntity : files
+FileEntity "0..*" --> "0..1" FolderEntity : parent
+
+FaqEntity "1" --> "0..*" FaqTranslationEntity : translations
+FaqTranslationEntity "0..*" --> "1" LanguageEntity : language
+SupportTicketEntity "1" --> "0..*" ChatbotInteractionEntity : interactions

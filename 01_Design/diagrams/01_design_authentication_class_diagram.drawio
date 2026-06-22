@@ -1,0 +1,124 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="auth-class-diagram" name="Authentication Class Diagram">
+    <mxGraphModel dx="3608" dy="2200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="AuthController" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;AuthController&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- authService: AuthService&lt;br&gt;- passwordService: PasswordService&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;+ register(req): AuthTokensResponse&lt;br&gt;+ login(req): AuthTokensResponse&lt;br&gt;+ refresh(req): AuthTokensResponse&lt;br&gt;+ logout(req): void&lt;br&gt;+ forgotPassword(req): void&lt;br&gt;+ resetPassword(req): void&lt;br&gt;+ changePassword(req, auth): void&lt;br&gt;+ me(auth): UserResponse&lt;br&gt;+ updateLanguage(req, auth): UserResponse" vertex="1">
+          <mxGeometry height="260" width="310" x="410" y="-180" as="geometry" />
+        </mxCell>
+        <mxCell id="AuthService" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;AuthService&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- authenticationManager: AuthenticationManager&lt;br&gt;- userRepository: UserRepository&lt;br&gt;- userSubscriptionRepository: UserSubscriptionRepository&lt;br&gt;- planRepository: PlanRepository&lt;br&gt;- languageRepository: LanguageRepository&lt;br&gt;- refreshTokenRepository: RefreshTokenRepository&lt;br&gt;- passwordEncoder: PasswordEncoder&lt;br&gt;- jwtService: JwtService&lt;br&gt;- refreshTtlSeconds: long&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;+ login(request): AuthTokensResponse&lt;br&gt;+ refresh(request): AuthTokensResponse&lt;br&gt;+ logout(request): void&lt;br&gt;+ register(request): AuthTokensResponse&lt;br&gt;+ getUserResponseById(id): UserResponse&lt;br&gt;+ updatePreferredLanguage(userId, code): UserResponse" vertex="1">
+          <mxGeometry height="330" width="380" x="160" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="JwtService" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;JwtService&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- secret: String&lt;br&gt;- expirationMs: long&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;+ generateToken(userId, email): String" vertex="1">
+          <mxGeometry height="145" width="285" x="-210" y="222.5" as="geometry" />
+        </mxCell>
+        <mxCell id="UserRepository" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;&lt;br&gt;UserRepository&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;+ findByEmail(email): Optional&amp;lt;UserEntity&amp;gt;&lt;br&gt;+ findByUsername(username): Optional&amp;lt;UserEntity&amp;gt;&lt;br&gt;+ existsByEmail(email): boolean&lt;br&gt;+ existsByUsername(username): boolean" vertex="1">
+          <mxGeometry height="150" width="360" x="160" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="PasswordResetTokenRepository" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;&lt;br&gt;PasswordResetTokenRepository&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;+ findByTokenHash(tokenHash): Optional&amp;lt;PasswordResetTokenEntity&amp;gt;&lt;br&gt;+ deleteByExpiresAtBefore(now): long" vertex="1">
+          <mxGeometry height="115" width="360" x="1230" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="LanguageRepository" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;&lt;br&gt;LanguageRepository&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;+ findByCode(code): Optional&amp;lt;LanguageEntity&amp;gt;" vertex="1">
+          <mxGeometry height="90" width="360" x="-285" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="PlanRepository" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;&lt;br&gt;PlanRepository&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;+ findByType(type): Optional&amp;lt;PlanEntity&amp;gt;&lt;br&gt;+ findByInternalNameAndIsActiveTrue(internalName): Optional&amp;lt;PlanEntity&amp;gt;&lt;br&gt;+ findFirstByTypeAndIsActiveTrue(type): Optional&amp;lt;PlanEntity&amp;gt;" vertex="1">
+          <mxGeometry height="135" width="360" x="940" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="UserEntity" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;UserEntity&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- id: Long&lt;br&gt;- username: String&lt;br&gt;- password: String&lt;br&gt;- email: String&lt;br&gt;- createdAt: LocalDateTime&lt;br&gt;- lastLogin: LocalDateTime&lt;br&gt;- currentStorageUsed: Long&lt;br&gt;- preferredLanguageEntity: LanguageEntity&lt;br&gt;- activeSubscription: UserSubscriptionEntity&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;getters and setters" vertex="1">
+          <mxGeometry height="245" width="310" x="330" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="RefreshTokenEntity" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;RefreshTokenEntity&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- id: Long&lt;br&gt;- user: UserEntity&lt;br&gt;- tokenHash: String&lt;br&gt;- expiresAt: Instant&lt;br&gt;- revokedAt: Instant&lt;br&gt;- createdAt: Instant&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;getters and setters" vertex="1">
+          <mxGeometry height="200" width="310" x="765" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="PasswordResetTokenEntity" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;PasswordResetTokenEntity&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- id: Long&lt;br&gt;- user: UserEntity&lt;br&gt;- tokenHash: String&lt;br&gt;- expiresAt: Instant&lt;br&gt;- usedAt: Instant&lt;br&gt;- createdAt: Instant&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;getters and setters" vertex="1">
+          <mxGeometry height="200" width="310" x="1370" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="LanguageEntity" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;LanguageEntity&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- id: Long&lt;br&gt;- code: String&lt;br&gt;- name: String&lt;br&gt;- isActive: Boolean&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;getters and setters" vertex="1">
+          <mxGeometry height="155" width="310" x="-260" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="PlanEntity" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;PlanEntity&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- id: Long&lt;br&gt;- internalName: String&lt;br&gt;- type: PlanType&lt;br&gt;- storageLimitGB: Integer&lt;br&gt;- pricePerMonth: BigDecimal&lt;br&gt;- currency: String&lt;br&gt;- isActive: Boolean&lt;br&gt;- createdAt: LocalDateTime&lt;br&gt;- updatedAt: LocalDateTime&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;getters and setters" vertex="1">
+          <mxGeometry height="235" width="300" x="1060" y="965" as="geometry" />
+        </mxCell>
+        <mxCell id="UserSubscriptionEntity" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;UserSubscriptionEntity&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- id: Long&lt;br&gt;- user: UserEntity&lt;br&gt;- planEntity: PlanEntity&lt;br&gt;- startDate: LocalDateTime&lt;br&gt;- endDate: LocalDateTime&lt;br&gt;- status: String&lt;br&gt;- renewalDate: LocalDateTime&lt;br&gt;- paymentMethodId: String&lt;br&gt;- createdAt: LocalDateTime&lt;br&gt;- updatedAt: LocalDateTime&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;getters and setters" vertex="1">
+          <mxGeometry height="255" width="300" x="580" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="AuthController" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="AuthService" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="AuthController" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="PasswordService" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="AuthService" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="JwtService" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="AuthService" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="UserRepository" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="AuthService" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="LanguageRepository" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="AuthService" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="PlanRepository" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="AuthService" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="UserSubscriptionRepository" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="PasswordService" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="UserRepository" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="PasswordService" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="PasswordResetTokenRepository" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" edge="1" parent="1" source="UserRepository" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#666666;" target="UserEntity" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" edge="1" parent="1" source="PasswordService" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#666666;" target="RefreshTokenEntity" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" edge="1" parent="1" source="PasswordResetTokenRepository" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#666666;" target="PasswordResetTokenEntity" value="persists">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" edge="1" parent="1" source="LanguageRepository" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#666666;" target="LanguageEntity" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r5" edge="1" parent="1" source="PlanRepository" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#666666;" target="PlanEntity" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r6" edge="1" parent="1" source="UserSubscriptionRepository" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#666666;" target="UserSubscriptionEntity" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" edge="1" parent="1" source="UserEntity" style="endArrow=none;html=1;rounded=0;strokeColor=#444444;" target="RefreshTokenEntity" value="1:n">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" edge="1" parent="1" source="UserEntity" style="endArrow=none;html=1;rounded=0;strokeColor=#444444;" target="PasswordResetTokenEntity" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a4" edge="1" parent="1" source="UserEntity" style="endArrow=none;html=1;rounded=0;strokeColor=#444444;" target="UserSubscriptionEntity" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a5" edge="1" parent="1" source="UserSubscriptionEntity" style="endArrow=none;html=1;rounded=0;strokeColor=#444444;" target="PlanEntity" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l50TrKKJhqM4AWmLpTrF-2" edge="1" parent="1" source="AuthService" style="endArrow=open;html=1;rounded=0;strokeWidth=1.4;" target="PasswordService" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="825" y="449" as="sourcePoint" />
+            <mxPoint x="1235" y="372" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PasswordService" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;PasswordService&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Fields&lt;/b&gt;&lt;br&gt;- userRepository: UserRepository&lt;br&gt;- passwordResetTokenRepository: PasswordResetTokenRepository&lt;br&gt;- passwordEncoder: PasswordEncoder&lt;br&gt;- mailSender: JavaMailSender&lt;br&gt;- resetTtlSeconds: long&lt;br&gt;&lt;br&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;+ forgotPassword(req): void&lt;br&gt;+ resetPassword(req): void&lt;br&gt;+ changePassword(req, auth): void" vertex="1">
+          <mxGeometry height="220" width="380" x="695" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="l50TrKKJhqM4AWmLpTrF-3" edge="1" parent="1" source="UserEntity" style="endArrow=none;html=1;rounded=0;strokeColor=#444444;" target="UserSubscriptionRepository" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="350" y="905" as="sourcePoint" />
+            <mxPoint x="705" y="1095" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UserSubscriptionRepository" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacing=8;fontSize=12;" value="&lt;b&gt;&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;&lt;br&gt;UserSubscriptionRepository&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;b&gt;Public methods&lt;/b&gt;&lt;br&gt;+ findByPlanEntity_Id(planId): Optional&amp;lt;UserSubscriptionEntity&amp;gt;&lt;br&gt;+ existsByUserId(userId): boolean" vertex="1">
+          <mxGeometry height="115" width="360" x="540" y="540" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
